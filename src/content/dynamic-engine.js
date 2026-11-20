@@ -3,14 +3,31 @@
 (function initDynamicEngine(global) {
   const DarkExt = (global.DarkExt = global.DarkExt || {});
 
-  const BATCH_SIZE = 40;
-  const MUTATION_DEBOUNCE_MS = 75;
+  const MICRO_BATCH_SIZE = 64;
+  const FRAME_BUDGET_MS = 8;
+  const MAX_NODES_PER_FRAME = 256;
+  const QUEUE_COMPACT_THRESHOLD = 512;
+  const MAX_VIBRANT_CACHE_SIZE = 512;
+  const MUTATION_DEBOUNCE_MS = 100;
   const TOAST_DURATION_MS = 2200;
 
   const RUNTIME_VARS_STYLE_ID = 'darkext-runtime-vars';
   const CUSTOM_CSS_STYLE_ID = 'darkext-custom-css';
   const TOAST_HOST_ID = 'darkext-toast-host';
   const STYLED_ATTR = 'data-darkext-styled';
+
+  const DEFAULT_ANCESTOR_BG = Object.freeze({
+    lum: 0.02,
+    isVibrant: false,
+    hasUrlBg: false,
+    hasBrightVibrant: false
+  });
+  const DARKENED_BG_INFO = Object.freeze({
+    lum: 0.02,
+    isVibrant: false,
+    hasUrlBg: false,
+    hasBrightVibrant: false
+  });
 
   const SKIP_TAGS = new Set([
     'IMG',
@@ -59,9 +76,13 @@
   let toastDismissTimer = null;
   let toastRemoveTimer = null;
 
-  const pendingQueue = [];
-  const queuedSet = new WeakSet();
-  const mutationBuffer = new Set();
+  let pendingQueue = [];
+  let queueHead = 0;
+  let queuedSet = new WeakSet();
+  let hiddenSkippedSet = new WeakSet();
+  const addedSubtreeBuffer = new Set();
+  const attrTargetBuffer = new Set();
+  const vibrantColorCache = new Map();
 
   let originalStyles = new WeakMap();
   let appliedStyles = new WeakMap();
@@ -77,6 +98,29 @@
   let popstateHandler = null;
   let hashchangeHandler = null;
   let navSuccessHandler = null;
+
+  function nowMs() {
+    return typeof performance !== 'undefined' && typeof performance.now === 'function'
+      ? performance.now()
+      : Date.now();
+  }
+
+  function clearPendingQueue() {
+    pendingQueue.length = 0;
+    queueHead = 0;
+    queuedSet = new WeakSet();
+    hiddenSkippedSet = new WeakSet();
+  }
+
+  function compactQueue() {
+    if (queueHead >= pendingQueue.length) {
+      pendingQueue.length = 0;
+      queueHead = 0;
+    } else if (queueHead >= QUEUE_COMPACT_THRESHOLD) {
+      pendingQueue = pendingQueue.slice(queueHead);
+      queueHead = 0;
+    }
+  }
 
   function getConstants() {
     return DarkExt.Constants || {};
@@ -129,6 +173,10 @@
 
   function isVibrantBrandColor(parsed, ColorUtils) {
     if (!parsed || parsed.a < 0.2 || !ColorUtils) return false;
+    const key = ((parsed.r & 0xff) << 16) | ((parsed.g & 0xff) << 8) | (parsed.b & 0xff);
+    if (vibrantColorCache.has(key)) {
+      return vibrantColorCache.get(key);
+    }
     const hsl = ColorUtils.rgbToHsl(parsed);
     const maxC = Math.max(parsed.r, parsed.g, parsed.b);
     const minC = Math.min(parsed.r, parsed.g, parsed.b);
@@ -136,33 +184,32 @@
     const lum = ColorUtils.relativeLuminance(parsed);
     if (lum === null) return false;
     // Distinguish genuine saturated brand fills (e.g. CTAs/badges) from pale pastel backgrounds
-    return chroma >= 0.28 && hsl.s >= 35 && hsl.l >= 22 && hsl.l <= 72 && lum < 0.78;
+    const result = chroma >= 0.28 && hsl.s >= 35 && hsl.l >= 22 && hsl.l <= 72 && lum < 0.78;
+    if (vibrantColorCache.size >= MAX_VIBRANT_CACHE_SIZE) {
+      const oldestKey = vibrantColorCache.keys().next().value;
+      vibrantColorCache.delete(oldestKey);
+    }
+    vibrantColorCache.set(key, result);
+    return result;
   }
 
-  function hasBrightVibrantAncestor(el, win, ColorUtils) {
-    if (!el || !win || typeof win.getComputedStyle !== 'function' || !ColorUtils) {
-      return false;
+  function getComputedStyleCached(el, win, styleCache) {
+    if (!el || !win || typeof win.getComputedStyle !== 'function') {
+      return null;
     }
-    let parent = el.parentElement;
-    for (let depth = 0; depth < 4 && parent; depth += 1) {
-      if (parent.tagName === 'BODY' || parent.tagName === 'HTML') {
-        break;
-      }
-      try {
-        const pStyle = win.getComputedStyle(parent);
-        const pBg = ColorUtils.parseCssColor(pStyle.backgroundColor);
-        if (pBg && pBg.a >= 0.5 && isVibrantBrandColor(pBg, ColorUtils)) {
-          const lum = ColorUtils.relativeLuminance(pBg);
-          if (lum !== null && lum > 0.35) {
-            return true;
-          }
-        }
-      } catch (_) {
-        break;
-      }
-      parent = parent.parentElement;
+    if (styleCache && styleCache.has(el)) {
+      return styleCache.get(el);
     }
-    return false;
+    let style = null;
+    try {
+      style = win.getComputedStyle(el);
+    } catch (_) {
+      style = null;
+    }
+    if (styleCache) {
+      styleCache.set(el, style);
+    }
+    return style;
   }
 
   function backupOriginalStyles(el) {
@@ -215,8 +262,11 @@
     if (role === 'dialog' || role === 'menu' || role === 'listbox') return true;
     if (style && style.boxShadow && style.boxShadow !== 'none') return true;
     if (style) {
-      for (const [, , widthProp, styleProp] of BORDER_PROPS) {
-        if (parseFloat(style[widthProp] || '0') > 0 && style[styleProp] && style[styleProp] !== 'none') {
+      for (let i = 0; i < BORDER_PROPS.length; i += 1) {
+        const [, , widthProp, styleProp] = BORDER_PROPS[i];
+        const bw = style[widthProp];
+        const bs = style[styleProp];
+        if (bw && bw !== '0px' && bs && bs !== 'none' && parseFloat(bw) > 0) {
           return true;
         }
       }
@@ -245,7 +295,7 @@
     if (el.id === 'nav-search-submit-button') return true;
     if (el.classList && el.classList.contains('a-button-input')) return true;
     const tag = (el.tagName || '').toUpperCase();
-    if (tag === 'INPUT' && style && parseFloat(style.opacity || '1') < 0.12) {
+    if (tag === 'INPUT' && style && style.opacity !== '1' && parseFloat(style.opacity || '1') < 0.12) {
       return true;
     }
     return false;
@@ -295,52 +345,87 @@
     return !sawParseable;
   }
 
-  function getAncestorBackgroundInfo(startEl, win, ColorUtils) {
+  function getAncestorBackgroundInfo(startEl, win, ColorUtils, styleCache, ancestorBgCache) {
     if (!startEl || !win || typeof win.getComputedStyle !== 'function' || !ColorUtils) {
-      return { lum: 0.02, isVibrant: false, hasUrlBg: false };
+      return DEFAULT_ANCESTOR_BG;
     }
+    if (ancestorBgCache && ancestorBgCache.has(startEl)) {
+      return ancestorBgCache.get(startEl);
+    }
+
     let cur = startEl;
+    let result = DEFAULT_ANCESTOR_BG;
     for (let depth = 0; depth < 6 && cur; depth += 1) {
-      try {
-        const st = win.getComputedStyle(cur);
-        if (st) {
-          const bgImg = st.backgroundImage || '';
-          if (bgImg && bgImg !== 'none' && bgImg.toLowerCase().includes('url(')) {
-            return { lum: 0.25, isVibrant: false, hasUrlBg: true };
-          }
-          const c = ColorUtils.parseCssColor(st.backgroundColor);
-          if (c && c.a >= 0.25) {
-            const lum = ColorUtils.relativeLuminance(c);
-            return {
-              lum: lum === null ? 0.02 : lum,
-              isVibrant: isVibrantBrandColor(c, ColorUtils),
-              hasUrlBg: false
-            };
-          }
-        }
-      } catch (_) {
+      if (depth > 0 && ancestorBgCache && ancestorBgCache.has(cur)) {
+        result = ancestorBgCache.get(cur);
         break;
+      }
+      const st = getComputedStyleCached(cur, win, styleCache);
+      if (!st) {
+        break;
+      }
+      const bgImg = st.backgroundImage || '';
+      if (bgImg && bgImg !== 'none' && bgImg.toLowerCase().includes('url(')) {
+        result = { lum: 0.25, isVibrant: false, hasUrlBg: true, hasBrightVibrant: false };
+        break;
+      }
+      const bgStr = st.backgroundColor;
+      if (bgStr && bgStr !== 'rgba(0, 0, 0, 0)' && bgStr !== 'transparent') {
+        const c = ColorUtils.parseCssColor(bgStr);
+        if (c && c.a >= 0.25) {
+          const lum = ColorUtils.relativeLuminance(c);
+          const resolvedLum = lum === null ? 0.02 : lum;
+          const isVibrant = isVibrantBrandColor(c, ColorUtils);
+          const upperTag = cur.tagName ? cur.tagName.toUpperCase() : '';
+          const hasBrightVibrant =
+            depth < 4 &&
+            upperTag !== 'BODY' &&
+            upperTag !== 'HTML' &&
+            c.a >= 0.5 &&
+            isVibrant &&
+            resolvedLum > 0.35;
+          result = {
+            lum: resolvedLum,
+            isVibrant,
+            hasUrlBg: false,
+            hasBrightVibrant
+          };
+          break;
+        }
       }
       cur = cur.parentElement;
     }
-    return { lum: 0.02, isVibrant: false, hasUrlBg: false };
+
+    if (ancestorBgCache) {
+      ancestorBgCache.set(startEl, result);
+    }
+    return result;
   }
 
-  function computeDarkeningPlan(el, style, presetColors, win, ColorUtils, options) {
-    if (isTransparentOverlayInput(el, style)) {
-      return {};
+  function computeDarkeningPlan(el, style, presetColors, win, ColorUtils, options, styleCache, ancestorBgCache) {
+    if (style.display === 'none' || isTransparentOverlayInput(el, style)) {
+      return null;
     }
 
     const plan = {};
+    let hasChanges = false;
     const isSiteThemeSweep = Boolean(options && options.siteThemeSweep);
-    const hasBgUrlImage =
-      Boolean(style.backgroundImage) &&
-      style.backgroundImage !== 'none' &&
-      style.backgroundImage.toLowerCase().includes('url(');
+    const bgImg = style.backgroundImage;
+    const hasBgImg = Boolean(bgImg) && bgImg !== 'none';
+    const hasBgUrlImage = hasBgImg && bgImg.toLowerCase().includes('url(');
 
-    const bg = ColorUtils.parseCssColor(style.backgroundColor);
+    const bgStr = style.backgroundColor;
+    const bg =
+      !bgStr || bgStr === 'rgba(0, 0, 0, 0)' || bgStr === 'transparent'
+        ? null
+        : ColorUtils.parseCssColor(bgStr);
     const bgLum = bg && bg.a >= 0.08 ? ColorUtils.relativeLuminance(bg) : null;
-    const fg = ColorUtils.parseCssColor(style.color);
+
+    const fgStr = style.color;
+    const fg =
+      !fgStr || fgStr === 'rgba(0, 0, 0, 0)' || fgStr === 'transparent'
+        ? null
+        : ColorUtils.parseCssColor(fgStr);
     const fgLum = fg && fg.a >= 0.1 ? ColorUtils.relativeLuminance(fg) : null;
 
     const tag = (el.tagName || '').toUpperCase();
@@ -355,7 +440,7 @@
     let accentAppliedToSubmit = false;
 
     const hasSelfVibrantBg = Boolean(bg && bg.a >= 0.2 && isVibrantBrandColor(bg, ColorUtils));
-    const lightGradient = !hasBgUrlImage && !hasSelfVibrantBg && hasLightCssGradient(style, ColorUtils);
+    const lightGradient = hasBgImg && !hasBgUrlImage && !hasSelfVibrantBg && hasLightCssGradient(style, ColorUtils);
 
     if (lightGradient) {
       plan.backgroundImage = 'none';
@@ -369,16 +454,20 @@
           : (presetColors.bg || '#121418');
       }
       bgDarkened = true;
+      hasChanges = true;
     }
 
     if (!bgDarkened && !hasBgUrlImage && bg && bg.a >= 0.08) {
-      if (isVibrantBrandColor(bg, ColorUtils)) {
+      if (hasSelfVibrantBg) {
         // Preserve brand/CTA element color; ensure text contrast stays readable
         if (bgLum !== null && bgLum > 0.35) {
           bgPreservedBright = true;
         } else if (bgLum !== null && bgLum <= 0.25 && fgLum !== null && fgLum < 0.35) {
           const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
-          if (lightFg) plan.color = lightFg;
+          if (lightFg) {
+            plan.color = lightFg;
+            hasChanges = true;
+          }
         }
       } else if (bgLum !== null && bgLum > 0.13) {
         if (submitOrSearch && !isSiteThemeSweep && presetColors.accent) {
@@ -386,6 +475,7 @@
           plan.color = presetColors.accentText || '#ffffff';
           bgDarkened = true;
           accentAppliedToSubmit = true;
+          hasChanges = true;
         } else if (!(isSiteThemeSweep && submitOrSearch)) {
           let darkBg = ColorUtils.darkenBackgroundColor(bg, presetColors);
           if (
@@ -399,25 +489,32 @@
           if (darkBg) {
             plan.backgroundColor = darkBg;
             bgDarkened = true;
+            hasChanges = true;
           }
         }
       } else if (bgLum !== null && bgLum <= 0.13 && bg.a >= 0.7 && fgLum !== null && fgLum < 0.35 && !submitOrSearch) {
         const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
-        if (lightFg) plan.color = lightFg;
+        if (lightFg) {
+          plan.color = lightFg;
+          hasChanges = true;
+        }
       }
     }
 
     let effectiveBg;
+    let ancestorBgInfo = null;
     if (bgDarkened) {
-      effectiveBg = { lum: 0.02, isVibrant: false, hasUrlBg: false };
+      effectiveBg = DARKENED_BG_INFO;
     } else if (!hasBgUrlImage && bg && bg.a >= 0.25) {
       effectiveBg = {
         lum: bgLum === null ? 0.02 : bgLum,
         isVibrant: hasSelfVibrantBg,
-        hasUrlBg: false
+        hasUrlBg: false,
+        hasBrightVibrant: false
       };
     } else {
-      effectiveBg = getAncestorBackgroundInfo(el.parentElement, win, ColorUtils);
+      ancestorBgInfo = getAncestorBackgroundInfo(el.parentElement, win, ColorUtils, styleCache, ancestorBgCache);
+      effectiveBg = ancestorBgInfo;
     }
 
     if (
@@ -427,10 +524,18 @@
       !(effectiveBg.isVibrant && effectiveBg.lum > 0.35)
     ) {
       if (fg && fg.a >= 0.1 && fgLum !== null && fgLum < 0.55 && !(isSiteThemeSweep && submitOrSearch)) {
-        if (bgDarkened || effectiveBg.lum < 0.22 || !hasBrightVibrantAncestor(el, win, ColorUtils)) {
+        let hasBrightVibrantAncestorFlag = false;
+        if (!bgDarkened && effectiveBg.lum >= 0.22) {
+          const info =
+            ancestorBgInfo ||
+            getAncestorBackgroundInfo(el.parentElement, win, ColorUtils, styleCache, ancestorBgCache);
+          hasBrightVibrantAncestorFlag = Boolean(info && info.hasBrightVibrant);
+        }
+        if (bgDarkened || effectiveBg.lum < 0.22 || !hasBrightVibrantAncestorFlag) {
           const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
           if (lightFg) {
             plan.color = lightFg;
+            hasChanges = true;
           }
         }
       }
@@ -441,16 +546,26 @@
     ) {
       if (fg && fg.a >= 0.1 && fgLum !== null && fgLum > 0.58) {
         plan.color = '#0f1111';
+        hasChanges = true;
       }
     }
 
-    for (const [jsProp, , widthProp, styleProp] of BORDER_PROPS) {
-      const bWidth = parseFloat(style[widthProp] || '0');
+    for (let i = 0; i < BORDER_PROPS.length; i += 1) {
+      const [jsProp, , widthProp, styleProp] = BORDER_PROPS[i];
+      const widthStr = style[widthProp];
       const bStyle = style[styleProp];
-      if (!bWidth || bWidth <= 0 || !bStyle || bStyle === 'none') {
+      if (!widthStr || widthStr === '0px' || !bStyle || bStyle === 'none') {
         continue;
       }
-      const bColor = ColorUtils.parseCssColor(style[jsProp]);
+      const bWidth = parseFloat(widthStr);
+      if (!bWidth || bWidth <= 0) {
+        continue;
+      }
+      const bColorStr = style[jsProp];
+      if (!bColorStr || bColorStr === 'rgba(0, 0, 0, 0)' || bColorStr === 'transparent') {
+        continue;
+      }
+      const bColor = ColorUtils.parseCssColor(bColorStr);
       if (!bColor || bColor.a < 0.1) continue;
       const bLum = ColorUtils.relativeLuminance(bColor);
       if (bLum !== null && bLum > 0.35 && !isVibrantBrandColor(bColor, ColorUtils)) {
@@ -461,15 +576,23 @@
         } else {
           plan[jsProp] = presetColors.border || '#384156';
         }
+        hasChanges = true;
       }
     }
 
-    return plan;
+    return hasChanges ? plan : null;
   }
 
   function applyPlanToElement(el, plan) {
-    const keys = Object.keys(plan);
-    if (keys.length === 0) {
+    if (!plan) return;
+    let hasAny = false;
+    for (const key in plan) {
+      if (Object.prototype.hasOwnProperty.call(plan, key)) {
+        hasAny = true;
+        break;
+      }
+    }
+    if (!hasAny) {
       return;
     }
 
@@ -531,6 +654,10 @@
     if (!rootNode) return;
     if (rootNode.nodeType === 1) {
       if (shouldSkipElement(rootNode)) return;
+      if (rootNode.style && rootNode.style.display === 'none') {
+        hiddenSkippedSet.add(rootNode);
+        return;
+      }
       enqueueElement(rootNode);
       if (rootNode.shadowRoot) {
         observeShadowRoot(rootNode.shadowRoot);
@@ -540,15 +667,33 @@
 
     const walkerRoot = rootNode;
     if (typeof document !== 'undefined' && typeof document.createTreeWalker === 'function') {
-      const SHOW_ELEMENT = typeof NodeFilter !== 'undefined' ? NodeFilter.SHOW_ELEMENT : 1;
-      const walker = document.createTreeWalker(walkerRoot, SHOW_ELEMENT);
+      const hasNodeFilter = typeof NodeFilter !== 'undefined';
+      const SHOW_ELEMENT = hasNodeFilter ? NodeFilter.SHOW_ELEMENT : 1;
+      const FILTER_ACCEPT = hasNodeFilter && NodeFilter.FILTER_ACCEPT !== undefined ? NodeFilter.FILTER_ACCEPT : 1;
+      const FILTER_REJECT = hasNodeFilter && NodeFilter.FILTER_REJECT !== undefined ? NodeFilter.FILTER_REJECT : 2;
+      const walker = document.createTreeWalker(walkerRoot, SHOW_ELEMENT, {
+        acceptNode(node) {
+          if (shouldSkipElement(node)) {
+            return FILTER_REJECT;
+          }
+          if (node.style && node.style.display === 'none') {
+            hiddenSkippedSet.add(node);
+            return FILTER_REJECT;
+          }
+          return FILTER_ACCEPT;
+        }
+      });
       let node = walker.nextNode();
       while (node) {
         if (!shouldSkipElement(node)) {
-          enqueueElement(node);
-          if (node.shadowRoot) {
-            observeShadowRoot(node.shadowRoot);
-            enqueueSubtree(node.shadowRoot);
+          if (node.style && node.style.display === 'none') {
+            hiddenSkippedSet.add(node);
+          } else {
+            enqueueElement(node);
+            if (node.shadowRoot) {
+              observeShadowRoot(node.shadowRoot);
+              enqueueSubtree(node.shadowRoot);
+            }
           }
         }
         node = walker.nextNode();
@@ -566,7 +711,7 @@
     if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
       return;
     }
-    if (rafId !== null || pendingQueue.length === 0) {
+    if (rafId !== null || queueHead >= pendingQueue.length) {
       return;
     }
     const scheduleRaf = typeof requestAnimationFrame === 'function'
@@ -578,58 +723,100 @@
   function processBatch() {
     rafId = null;
     if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
-      pendingQueue.length = 0;
+      clearPendingQueue();
       return;
     }
 
     const win = typeof window !== 'undefined' ? window : global;
     const ColorUtils = getColorUtils();
     if (!win || typeof win.getComputedStyle !== 'function' || !ColorUtils) {
-      pendingQueue.length = 0;
+      clearPendingQueue();
       return;
     }
 
     const presetColors = getPresetColors(currentConfig.preset);
     const planOptions = { siteThemeSweep: currentConfig.mode === 'site-theme' };
-    const batch = [];
+    const styleCache = new Map();
+    const ancestorBgCache = new Map();
 
-    while (batch.length < BATCH_SIZE && pendingQueue.length > 0) {
-      const el = pendingQueue.shift();
-      queuedSet.delete(el);
-      if (!el || !el.isConnected || shouldSkipElement(el)) {
-        continue;
+    const frameStart = nowMs();
+    let totalProcessed = 0;
+
+    while (
+      queueHead < pendingQueue.length &&
+      totalProcessed < MAX_NODES_PER_FRAME &&
+      (totalProcessed === 0 || nowMs() - frameStart < FRAME_BUDGET_MS)
+    ) {
+      const microLimit = Math.min(MICRO_BATCH_SIZE, MAX_NODES_PER_FRAME - totalProcessed);
+      const batch = [];
+
+      while (batch.length < microLimit && queueHead < pendingQueue.length) {
+        const el = pendingQueue[queueHead];
+        pendingQueue[queueHead] = undefined;
+        queueHead += 1;
+        queuedSet.delete(el);
+        if (!el || !el.isConnected || shouldSkipElement(el)) {
+          continue;
+        }
+        if (el.style && el.style.display === 'none') {
+          hiddenSkippedSet.add(el);
+          continue;
+        }
+        // If previously styled and re-queued due to mutation, restore original before reading site style
+        if (appliedStyles.has(el)) {
+          restoreElementStyles(el);
+          styleCache.delete(el);
+          ancestorBgCache.delete(el);
+        }
+        batch.push(el);
       }
-      // If previously styled and re-queued due to mutation, restore original before reading site style
-      if (appliedStyles.has(el)) {
-        restoreElementStyles(el);
+
+      if (batch.length === 0) {
+        break;
       }
-      batch.push(el);
+
+      // Read phase: compute all styles before mutating DOM to prevent layout thrashing
+      const writes = [];
+      for (let i = 0; i < batch.length; i += 1) {
+        const el = batch[i];
+        const computed = getComputedStyleCached(el, win, styleCache);
+        if (!computed) continue;
+        if (computed.display === 'none') {
+          hiddenSkippedSet.add(el);
+          continue;
+        }
+        const plan = computeDarkeningPlan(
+          el,
+          computed,
+          presetColors,
+          win,
+          ColorUtils,
+          planOptions,
+          styleCache,
+          ancestorBgCache
+        );
+        if (plan !== null) {
+          writes.push([el, plan]);
+        }
+      }
+
+      // Write phase
+      for (let i = 0; i < writes.length; i += 1) {
+        const [el, plan] = writes[i];
+        if (el.isConnected) {
+          applyPlanToElement(el, plan);
+          if (plan.backgroundColor || plan.backgroundImage) {
+            styleCache.delete(el);
+            ancestorBgCache.delete(el);
+          }
+        }
+      }
+
+      totalProcessed += batch.length;
     }
 
-    // Read phase: compute all styles before mutating DOM to prevent layout thrashing
-    const writes = [];
-    for (const el of batch) {
-      let computed;
-      try {
-        computed = win.getComputedStyle(el);
-      } catch (_) {
-        continue;
-      }
-      if (!computed) continue;
-      const plan = computeDarkeningPlan(el, computed, presetColors, win, ColorUtils, planOptions);
-      if (Object.keys(plan).length > 0) {
-        writes.push([el, plan]);
-      }
-    }
-
-    // Write phase
-    for (const [el, plan] of writes) {
-      if (el.isConnected) {
-        applyPlanToElement(el, plan);
-      }
-    }
-
-    if (pendingQueue.length > 0) {
+    compactQueue();
+    if (queueHead < pendingQueue.length) {
       scheduleBatchProcessing();
     }
   }
@@ -654,7 +841,7 @@
       if (record.type === 'childList') {
         for (const added of record.addedNodes) {
           if (added && added.nodeType === 1 && !shouldSkipElement(added)) {
-            mutationBuffer.add(added);
+            addedSubtreeBuffer.add(added);
           }
         }
       } else if (record.type === 'attributes') {
@@ -668,7 +855,7 @@
         if (record.attributeName === 'style' && !didInlineStyleDiverge(target)) {
           continue;
         }
-        mutationBuffer.add(target);
+        attrTargetBuffer.add(target);
       }
     }
 
@@ -679,7 +866,7 @@
       }
     }
 
-    if (mutationBuffer.size === 0) {
+    if (addedSubtreeBuffer.size === 0 && attrTargetBuffer.size === 0) {
       return;
     }
 
@@ -692,16 +879,30 @@
   function flushMutationBuffer() {
     mutationDebounceTimer = null;
     if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
-      mutationBuffer.clear();
+      addedSubtreeBuffer.clear();
+      attrTargetBuffer.clear();
       return;
     }
 
-    for (const el of mutationBuffer) {
+    for (const el of addedSubtreeBuffer) {
       if (el && el.isConnected && !shouldSkipElement(el)) {
         enqueueSubtree(el);
       }
     }
-    mutationBuffer.clear();
+    addedSubtreeBuffer.clear();
+
+    for (const target of attrTargetBuffer) {
+      if (target && target.isConnected && !shouldSkipElement(target)) {
+        if (hiddenSkippedSet.has(target)) {
+          hiddenSkippedSet.delete(target);
+          enqueueSubtree(target);
+        } else {
+          enqueueElement(target);
+        }
+      }
+    }
+    attrTargetBuffer.clear();
+
     scheduleBatchProcessing();
   }
 
@@ -725,7 +926,8 @@
       clearTimeout(mutationDebounceTimer);
       mutationDebounceTimer = null;
     }
-    mutationBuffer.clear();
+    addedSubtreeBuffer.clear();
+    attrTargetBuffer.clear();
     if (mainObserver) {
       mainObserver.disconnect();
       mainObserver = null;
@@ -887,7 +1089,13 @@
     root.setAttribute('data-darkext-active', 'true');
     root.setAttribute('data-darkext-mode', config.mode || 'dynamic');
     root.setAttribute('data-darkext-preset', config.preset || 'midnight');
-    root.setAttribute('data-darkext-dim-images', config.dimImages === false ? 'false' : 'true');
+
+    const imageBrightness = clampNum(config.imageBrightness, 50, 100, 90);
+    if (config.dimImages !== false && imageBrightness < 100) {
+      root.setAttribute('data-darkext-dim-images', 'true');
+    } else {
+      root.removeAttribute('data-darkext-dim-images');
+    }
 
     if (config.mode === 'site-theme' && config.siteThemeId) {
       root.setAttribute('data-darkext-site', config.siteThemeId);
@@ -942,7 +1150,8 @@
       }
       rafId = null;
     }
-    pendingQueue.length = 0;
+    clearPendingQueue();
+    vibrantColorCache.clear();
 
     stopMutationObservers();
     uninstallSpaHooks();
@@ -979,7 +1188,7 @@
         }
         rafId = null;
       }
-      pendingQueue.length = 0;
+      clearPendingQueue();
       stopMutationObservers();
       restoreAllInlineStyles();
     }
@@ -1130,7 +1339,7 @@
         }
         rafId = null;
       }
-      pendingQueue.length = 0;
+      clearPendingQueue();
       restoreAllInlineStyles();
       if (mainObserver && typeof mainObserver.takeRecords === 'function') {
         mainObserver.takeRecords();

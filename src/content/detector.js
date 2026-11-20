@@ -16,7 +16,9 @@
     'theme'
   ];
   const DARK_ATTR_VAL_RE = /^(dark|night|black|oled|midnight|dim|dark[-_].*)$/i;
-  const PRIMARY_CONTAINER_SELECTOR = 'main, [role="main"], #main, #content, #app, #root, #__next, article, .app, .main-content';
+  const PRIMARY_CONTAINER_SELECTOR = 'main, [role="main"], #main, #content, #app, #root, #__next, .app, .main-content';
+  const MAX_CANDIDATE_CHECKS = 15;
+  const EARLY_EXIT_COVERAGE = 0.55;
 
   function getColorUtils() {
     return DarkExt.ColorUtils || null;
@@ -32,10 +34,11 @@
     } catch (_) {
       return null;
     }
-    if (!style || !style.backgroundColor) {
+    const bgStr = style && style.backgroundColor;
+    if (!bgStr || bgStr === 'transparent' || bgStr === 'rgba(0, 0, 0, 0)') {
       return null;
     }
-    const parsed = ColorUtils.parseCssColor(style.backgroundColor);
+    const parsed = ColorUtils.parseCssColor(bgStr);
     if (!parsed) {
       return null;
     }
@@ -128,10 +131,13 @@
       if (!seen.has(el)) {
         seen.add(el);
         candidates.push(el);
+        if (candidates.length >= MAX_CANDIDATE_CHECKS) {
+          break;
+        }
       }
     }
 
-    if (body && body.children) {
+    if (candidates.length < MAX_CANDIDATE_CHECKS && body && body.children) {
       const limit = Math.min(body.children.length, 12);
       for (let i = 0; i < limit; i += 1) {
         const child = body.children[i];
@@ -150,12 +156,17 @@
         if (!seen.has(child)) {
           seen.add(child);
           candidates.push(child);
+          if (candidates.length >= MAX_CANDIDATE_CHECKS) {
+            break;
+          }
         }
       }
     }
 
     let best = null;
-    for (const el of candidates) {
+    const scanLimit = Math.min(candidates.length, MAX_CANDIDATE_CHECKS);
+    for (let i = 0; i < scanLimit; i += 1) {
+      const el = candidates[i];
       const sample = parseBgSample(el, win, ColorUtils);
       if (!sample) continue;
       if (sample.style.display === 'none' || sample.style.visibility === 'hidden') {
@@ -179,6 +190,9 @@
       }
       if (!best || area > best.area) {
         best = { el, sample, area, coverage };
+        if (coverage >= EARLY_EXIT_COVERAGE) {
+          break;
+        }
       }
     }
 

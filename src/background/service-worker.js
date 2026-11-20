@@ -12,6 +12,42 @@ importScripts(
 const { Constants, SiteMatcher, Schedule, Storage } = globalThis.DarkExt;
 const { MESSAGE_TYPES, CONTEXT_MENU_IDS, ALARM_NAMES, COMMAND_NAMES, PATHS } = Constants;
 
+let cachedRegistry = null;
+let registryPromise = null;
+const MAX_TRACKED_TABS = 512;
+const lastSeenTabUrl = new Map();
+
+function trackTabUrl(tabId, url) {
+  if (lastSeenTabUrl.has(tabId)) {
+    lastSeenTabUrl.delete(tabId);
+  } else if (lastSeenTabUrl.size >= MAX_TRACKED_TABS) {
+    const oldestId = lastSeenTabUrl.keys().next().value;
+    lastSeenTabUrl.delete(oldestId);
+  }
+  lastSeenTabUrl.set(tabId, url);
+}
+
+function isNonHttpOrIgnoredUrl(url) {
+  if (typeof url !== 'string' || !url) {
+    return true;
+  }
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return true;
+  }
+  const lower = trimmed.toLowerCase();
+  if (
+    lower.startsWith('chrome://') ||
+    lower.startsWith('vivaldi://') ||
+    lower.startsWith('about:') ||
+    lower.startsWith('edge://') ||
+    lower.startsWith('chrome-extension://')
+  ) {
+    return true;
+  }
+  return !SiteMatcher.isSupportedUrl(trimmed);
+}
+
 async function getActiveTab() {
   if (!chrome.tabs || typeof chrome.tabs.query !== 'function') {
     return null;
@@ -39,24 +75,35 @@ async function sendMessageToTab(tabId, message) {
   }
 }
 
+async function queryAllTabs() {
+  try {
+    const tabs = await chrome.tabs.query({});
+    return Array.isArray(tabs) ? tabs : [];
+  } catch {
+    return [];
+  }
+}
+
 async function broadcastSettingsUpdated(settings, customCssMap) {
   if (!chrome.tabs || typeof chrome.tabs.query !== 'function') {
     return;
   }
-  const cssMap = customCssMap || (await Storage.getAllCustomCss());
-  let tabs = [];
-  try {
-    tabs = await chrome.tabs.query({});
-  } catch {
-    tabs = [];
-  }
+  const [cssMap, tabs] = await Promise.all([
+    customCssMap ? Promise.resolve(customCssMap) : Storage.getAllCustomCss(),
+    queryAllTabs()
+  ]);
+  const message = {
+    type: MESSAGE_TYPES.SETTINGS_UPDATED,
+    payload: { settings, customCssMap: cssMap }
+  };
+  const deliveries = [];
   for (const tab of tabs) {
     if (tab && typeof tab.id === 'number' && SiteMatcher.isSupportedUrl(tab.url || '')) {
-      await sendMessageToTab(tab.id, {
-        type: MESSAGE_TYPES.SETTINGS_UPDATED,
-        payload: { settings, customCssMap: cssMap }
-      });
+      deliveries.push(sendMessageToTab(tab.id, message));
     }
+  }
+  if (deliveries.length > 0) {
+    await Promise.allSettled(deliveries);
   }
 }
 
@@ -98,13 +145,14 @@ async function setBadge(tabId, text, bgColor) {
     return;
   }
   try {
-    await chrome.action.setBadgeText({ tabId, text: String(text || '') });
+    const ops = [chrome.action.setBadgeText({ tabId, text: String(text || '') })];
     if (text && bgColor && typeof chrome.action.setBadgeBackgroundColor === 'function') {
-      await chrome.action.setBadgeBackgroundColor({ tabId, color: bgColor });
+      ops.push(chrome.action.setBadgeBackgroundColor({ tabId, color: bgColor }));
     }
     if (text && typeof chrome.action.setBadgeTextColor === 'function') {
-      await chrome.action.setBadgeTextColor({ tabId, color: '#ffffff' });
+      ops.push(chrome.action.setBadgeTextColor({ tabId, color: '#ffffff' }));
     }
+    await Promise.all(ops);
   } catch {
     // Tab may have closed before badge update completed
   }
@@ -138,19 +186,34 @@ async function updateTabBadge(tabId, state) {
 }
 
 async function loadSiteThemeRegistry() {
+  if (cachedRegistry) {
+    return cachedRegistry;
+  }
   if (!chrome.runtime || typeof chrome.runtime.getURL !== 'function' || typeof fetch !== 'function') {
     return [];
   }
-  try {
-    const res = await fetch(chrome.runtime.getURL(PATHS.REGISTRY));
-    if (!res.ok) {
-      return [];
-    }
-    const json = await res.json();
-    return Array.isArray(json) ? json : [];
-  } catch {
-    return [];
+  if (!registryPromise) {
+    registryPromise = (async () => {
+      try {
+        const res = await fetch(chrome.runtime.getURL(PATHS.REGISTRY));
+        if (!res.ok) {
+          return null;
+        }
+        const json = await res.json();
+        if (Array.isArray(json)) {
+          cachedRegistry = json;
+          return cachedRegistry;
+        }
+        return null;
+      } catch {
+        return null;
+      } finally {
+        registryPromise = null;
+      }
+    })();
   }
+  const result = await registryPromise;
+  return result || [];
 }
 
 async function refreshTabBadgeFromUrl(tabId, url) {
@@ -161,12 +224,14 @@ async function refreshTabBadgeFromUrl(tabId, url) {
     await updateTabBadge(tabId, { supported: false });
     return;
   }
-  const settings = await Storage.getSettings();
+  const [settings, sessionState] = await Promise.all([
+    Storage.getSettings(),
+    getSessionTabState(tabId)
+  ]);
   if (!settings.enabled) {
     await updateTabBadge(tabId, { supported: true, active: false, globallyDisabled: true });
     return;
   }
-  const sessionState = await getSessionTabState(tabId);
   if (sessionState) {
     await updateTabBadge(tabId, {
       supported: true,
@@ -457,11 +522,13 @@ async function handleMessage(message, sender) {
           scheduleBlocked: false
         };
       }
-      const settings = await Storage.getSettings();
-      const registry = await loadSiteThemeRegistry();
-      const sessionState = targetTab && typeof targetTab.id === 'number'
-        ? await getSessionTabState(targetTab.id)
-        : null;
+      const [settings, registry, sessionState] = await Promise.all([
+        Storage.getSettings(),
+        loadSiteThemeRegistry(),
+        targetTab && typeof targetTab.id === 'number'
+          ? getSessionTabState(targetTab.id)
+          : Promise.resolve(null)
+      ]);
       const nativeDarkDetected = Boolean(sessionState && sessionState.nativeDarkDetected);
       const resolved = SiteMatcher.resolveEffectiveSiteConfig(hostname, settings, registry, {
         nativeDarkDetected
@@ -698,12 +765,33 @@ if (chrome.tabs && chrome.tabs.onActivated) {
   });
 }
 
+if (chrome.tabs && chrome.tabs.onRemoved) {
+  chrome.tabs.onRemoved.addListener((tabId) => {
+    lastSeenTabUrl.delete(tabId);
+  });
+}
+
 if (chrome.tabs && chrome.tabs.onUpdated) {
   chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-    if (!changeInfo || (changeInfo.status !== 'complete' && !changeInfo.url)) {
+    if (typeof tabId !== 'number' || !changeInfo) {
       return;
     }
-    await refreshTabBadgeFromUrl(tabId, (tab && tab.url) || changeInfo.url || '');
+    const isComplete = changeInfo.status === 'complete';
+    const hasUrlChange = typeof changeInfo.url === 'string' && changeInfo.url.length > 0;
+    if (!isComplete && !hasUrlChange) {
+      return;
+    }
+    const targetUrl = (hasUrlChange ? changeInfo.url : (tab && tab.url)) || '';
+    if (isNonHttpOrIgnoredUrl(targetUrl)) {
+      lastSeenTabUrl.delete(tabId);
+      return;
+    }
+    const prevUrl = lastSeenTabUrl.get(tabId);
+    if (!isComplete && prevUrl === targetUrl) {
+      return;
+    }
+    trackTabUrl(tabId, targetUrl);
+    await refreshTabBadgeFromUrl(tabId, targetUrl);
   });
 }
 

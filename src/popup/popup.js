@@ -56,7 +56,8 @@
     pendingPatch: {},
     tabRefreshTimer: null,
     tabRefreshInFlight: null,
-    pendingTabRefresh: false
+    pendingTabRefresh: false,
+    tabStateLoaded: false
   };
 
   const el = {};
@@ -220,10 +221,31 @@
       }
     } catch (_) {
       // Ignore tab query failure in restricted contexts
+    } finally {
+      state.tabStateLoaded = true;
     }
   }
 
-  async function loadInitialState() {
+  async function loadSettingsState() {
+    if (
+      typeof chrome !== 'undefined' &&
+      chrome.storage &&
+      chrome.storage.sync &&
+      typeof chrome.storage.sync.get === 'function' &&
+      typeof Storage.getSettings === 'function'
+    ) {
+      try {
+        const directSettings = await Storage.getSettings();
+        if (directSettings && typeof directSettings === 'object') {
+          state.settings = Object.assign({}, DEFAULTS, directSettings);
+          state.effectiveEnabled = Boolean(state.settings.enabled) && !computeFallbackScheduleBlocked(state.settings);
+          return;
+        }
+      } catch (_) {
+        // Fall through to runtime message
+      }
+    }
+
     const resp = await sendRuntime(MSG.GET_SETTINGS, {});
     if (resp && resp.ok && resp.settings) {
       state.settings = Object.assign({}, DEFAULTS, resp.settings);
@@ -236,8 +258,13 @@
       state.settings = Object.assign({}, DEFAULTS, await Storage.getSettings());
       state.effectiveEnabled = Boolean(state.settings.enabled) && !computeFallbackScheduleBlocked(state.settings);
     }
+  }
 
-    await queryActiveTab();
+  async function loadInitialState() {
+    await Promise.all([
+      loadSettingsState(),
+      queryActiveTab()
+    ]);
     render();
   }
 
@@ -564,8 +591,11 @@
     const resp = await sendRuntime(MSG.UPDATE_SETTINGS, { patch: { preset } });
     if (resp && resp.ok && resp.settings) {
       state.settings = Object.assign({}, DEFAULTS, resp.settings);
+      state.effectiveEnabled = Boolean(state.settings.enabled) && !computeFallbackScheduleBlocked(state.settings);
     }
-    await queryActiveTab();
+    if (!state.tabStateLoaded) {
+      await queryActiveTab();
+    }
     render();
   }
 

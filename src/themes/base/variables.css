@@ -185,5 +185,4 @@ html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) ::selection {
 html[data-darkext-active="true"]:not([data-darkext-mode="filter"])[data-darkext-dim-images="true"] img,
 html[data-darkext-active="true"]:not([data-darkext-mode="filter"])[data-darkext-dim-images="true"] video {
   filter: brightness(var(--de-image-brightness, 0.9));
-  transition: filter 0.15s ease;
 }

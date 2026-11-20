@@ -13,9 +13,38 @@
     Schedule = require('./schedule.js');
   }
 
+  const MAX_PATTERN_REGEX_CACHE = 256;
+  const patternRegexCache = new Map();
+
+  function isCleanLowercaseHost(input) {
+    const len = input.length;
+    if (len === 0 || input.charCodeAt(len - 1) === 46) {
+      return false;
+    }
+    for (let i = 0; i < len; i += 1) {
+      const c = input.charCodeAt(i);
+      const isValid =
+        (c >= 97 && c <= 122) || // a-z
+        (c >= 48 && c <= 57) ||  // 0-9
+        c === 45 ||              // -
+        c === 46 ||              // .
+        c === 95;                // _
+      if (!isValid) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   function normalizeHostname(input) {
     if (typeof input !== 'string') {
       return '';
+    }
+    if (isCleanLowercaseHost(input)) {
+      if (input.startsWith('www.') && input.indexOf('.', 4) > 4) {
+        return input.slice(4);
+      }
+      return input;
     }
     let host = input.trim().toLowerCase();
     if (!host) {
@@ -43,11 +72,23 @@
   }
 
   function isSupportedUrl(url) {
-    if (typeof url !== 'string' || !url.trim()) {
+    if (typeof url !== 'string') {
+      return false;
+    }
+    const trimmed = url.trim();
+    if (!trimmed) {
+      return false;
+    }
+    const c0 = trimmed.charCodeAt(0);
+    if (c0 !== 104 && c0 !== 72) {
+      return false;
+    }
+    const lowerPrefix = trimmed.slice(0, 6).toLowerCase();
+    if (!lowerPrefix.startsWith('http:') && !lowerPrefix.startsWith('https:')) {
       return false;
     }
     try {
-      const parsed = new URL(url.trim());
+      const parsed = new URL(trimmed);
       return (parsed.protocol === 'http:' || parsed.protocol === 'https:') && Boolean(parsed.hostname);
     } catch {
       return false;
@@ -70,23 +111,10 @@
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  function domainMatches(hostname, pattern) {
-    const host = normalizeHostname(hostname);
-    if (!host || typeof pattern !== 'string') {
-      return false;
-    }
-
-    let pat = pattern.trim().toLowerCase().replace(/\.+$/, '');
-    if (!pat) {
-      return false;
-    }
-
-    if (!pat.includes('*')) {
-      const normPat = normalizeHostname(pat);
-      if (!normPat) {
-        return false;
-      }
-      return host === normPat || host.endsWith('.' + normPat);
+  function getWildcardPatternRegex(pat) {
+    let regex = patternRegexCache.get(pat);
+    if (regex !== undefined) {
+      return regex;
     }
 
     // Build anchored regex supporting leading "*." (root + subdomains),
@@ -107,8 +135,41 @@
 
     const middleSegments = work.split('*').map(escapeRegex);
     const middle = middleSegments.join('[^.]*');
-    const regex = new RegExp(prefix + middle + suffix);
-    return regex.test(host);
+    regex = new RegExp(prefix + middle + suffix);
+
+    if (pat.length <= 256) {
+      if (patternRegexCache.size >= MAX_PATTERN_REGEX_CACHE) {
+        const oldestKey = patternRegexCache.keys().next().value;
+        patternRegexCache.delete(oldestKey);
+      }
+      patternRegexCache.set(pat, regex);
+    }
+    return regex;
+  }
+
+  function domainMatches(hostname, pattern) {
+    const host = normalizeHostname(hostname);
+    if (!host || typeof pattern !== 'string') {
+      return false;
+    }
+
+    let pat = pattern.trim().toLowerCase();
+    if (pat.endsWith('.')) {
+      pat = pat.replace(/\.+$/, '');
+    }
+    if (!pat) {
+      return false;
+    }
+
+    if (!pat.includes('*')) {
+      const normPat = normalizeHostname(pat);
+      if (!normPat) {
+        return false;
+      }
+      return host === normPat || host.endsWith('.' + normPat);
+    }
+
+    return getWildcardPatternRegex(pat).test(host);
   }
 
   function scoreDomainPattern(host, pattern) {

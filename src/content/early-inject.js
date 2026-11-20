@@ -63,7 +63,7 @@
     styleEl.textContent = [
       'html, body {',
       `  background-color: ${shieldBg} !important;`,
-      '  color: #e6e9ef !important;',
+      '  color: #f4f6fa !important;',
       '  color-scheme: dark !important;',
       '}'
     ].join('\n');

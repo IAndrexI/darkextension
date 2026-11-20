@@ -27,9 +27,11 @@
   };
 
   let cachedRegistry = null;
+  let registryPromise = null;
   let injectedCssFiles = [];
   let currentSettings = null;
   let currentCustomCss = '';
+  let lastReportedStateSig = null;
   let lastAppliedState = {
     hostname: '',
     supported: false,
@@ -96,26 +98,66 @@
     if (Array.isArray(cachedRegistry)) {
       return cachedRegistry;
     }
+    if (registryPromise) {
+      return registryPromise;
+    }
     if (typeof chrome === 'undefined' || !chrome.runtime || typeof chrome.runtime.getURL !== 'function' || typeof fetch !== 'function') {
       cachedRegistry = [];
       return cachedRegistry;
     }
-    try {
-      const res = await fetch(chrome.runtime.getURL(PATHS.REGISTRY));
-      if (!res.ok) {
+    registryPromise = (async () => {
+      try {
+        const res = await fetch(chrome.runtime.getURL(PATHS.REGISTRY));
+        if (!res.ok) {
+          cachedRegistry = [];
+          return cachedRegistry;
+        }
+        const data = await res.json();
+        cachedRegistry = Array.isArray(data) ? data : [];
+        return cachedRegistry;
+      } catch (_) {
         cachedRegistry = [];
         return cachedRegistry;
+      } finally {
+        registryPromise = null;
       }
-      const data = await res.json();
-      cachedRegistry = Array.isArray(data) ? data : [];
-      return cachedRegistry;
-    } catch (_) {
-      cachedRegistry = [];
-      return cachedRegistry;
-    }
+    })();
+    return registryPromise;
+  }
+
+  function getStorageApi() {
+    return DarkExt.Storage || Storage;
   }
 
   async function fetchSettingsAndCss(hostname) {
+    const storageApi = getStorageApi();
+    const hasDirectStorage =
+      storageApi &&
+      typeof storageApi.getSettings === 'function' &&
+      (typeof chrome === 'undefined' ||
+        !chrome.runtime ||
+        typeof chrome.runtime.sendMessage !== 'function' ||
+        (chrome.storage && chrome.storage.sync));
+
+    if (hasDirectStorage) {
+      try {
+        const [settings, customCss] = await Promise.all([
+          storageApi.getSettings(),
+          hostname && typeof storageApi.getCustomCss === 'function'
+            ? storageApi.getCustomCss(hostname)
+            : Promise.resolve('')
+        ]);
+        if (settings) {
+          return {
+            settings,
+            customCss: typeof customCss === 'string' ? customCss : ''
+          };
+        }
+      } catch (_) {
+        // Fall through to service worker IPC if direct storage access fails
+      }
+    }
+
     const resp = await sendRuntimeMessage(MSG.GET_SETTINGS, { hostname });
     if (resp && resp.ok && resp.settings) {
       return {
@@ -124,16 +166,26 @@
       };
     }
 
-    const fallbackSettings = typeof Storage.getSettings === 'function'
-      ? await Storage.getSettings()
-      : Object.assign({}, Constants.DEFAULT_SETTINGS || {});
-    const fallbackCss = hostname && typeof Storage.getCustomCss === 'function'
-      ? await Storage.getCustomCss(hostname)
-      : '';
+    if (storageApi && typeof storageApi.getSettings === 'function') {
+      try {
+        const [fallbackSettings, fallbackCss] = await Promise.all([
+          storageApi.getSettings(),
+          hostname && typeof storageApi.getCustomCss === 'function'
+            ? storageApi.getCustomCss(hostname)
+            : Promise.resolve('')
+        ]);
+        return {
+          settings: fallbackSettings,
+          customCss: fallbackCss || ''
+        };
+      } catch (_) {
+        // Fall through to default settings
+      }
+    }
 
     return {
-      settings: fallbackSettings,
-      customCss: fallbackCss || ''
+      settings: Object.assign({}, Constants.DEFAULT_SETTINGS || {}),
+      customCss: ''
     };
   }
 
@@ -241,12 +293,33 @@
     return Detector.detectNativeDarkMode(document);
   }
 
+  function getReportedLocationKey() {
+    try {
+      if (typeof location !== 'undefined' && location) {
+        return `${location.hostname || ''}${location.pathname || ''}`;
+      }
+    } catch (_) {
+      // Ignore restricted location access
+    }
+    return '';
+  }
+
   async function reportStateToSw(state) {
+    const active = Boolean(state.active);
+    const mode = state.mode || 'off';
+    const isNativeDark = Boolean(state.nativeDarkDetected);
+    const matchedThemeId = state.appliedThemeId || null;
+    const pathname = getReportedLocationKey();
+    const sig = `${active}|${mode}|${isNativeDark}|${matchedThemeId || ''}|${pathname}`;
+    if (sig === lastReportedStateSig) {
+      return;
+    }
+    lastReportedStateSig = sig;
     await sendRuntimeMessage(MSG.REPORT_TAB_STATE, {
-      active: Boolean(state.active),
-      mode: state.mode || 'off',
-      nativeDarkDetected: Boolean(state.nativeDarkDetected),
-      themeId: state.appliedThemeId || null
+      active,
+      mode,
+      nativeDarkDetected: isNativeDark,
+      themeId: matchedThemeId
     });
   }
 
@@ -258,6 +331,7 @@
       : /^https?:\/\//i.test(url);
 
     if (!supported) {
+      lastReportedStateSig = null;
       if (typeof DynamicEngine.teardown === 'function') {
         DynamicEngine.teardown();
       }
@@ -282,10 +356,13 @@
       ? SiteMatcher.extractHostname(url)
       : '';
 
-    const registry = await loadRegistry();
+    const needsRefetch = !currentSettings || Boolean(opts.refetch);
+    const [registry, fetched] = await Promise.all([
+      loadRegistry(),
+      needsRefetch ? fetchSettingsAndCss(hostname) : Promise.resolve(null)
+    ]);
 
-    if (!currentSettings || opts.refetch) {
-      const fetched = await fetchSettingsAndCss(hostname);
+    if (fetched) {
       currentSettings = fetched.settings;
       currentCustomCss = fetched.customCss;
     }

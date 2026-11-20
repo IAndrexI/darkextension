@@ -103,6 +103,8 @@
     currentWindowId: null,
     sliderTimer: null,
     pendingSliderPatch: {},
+    themeSearchTimer: null,
+    rulesSearchTimer: null,
     toastTimer: null
   };
 
@@ -373,12 +375,50 @@
     el.themeCategoryFilter.value = categories.includes(current) ? current : 'all';
   }
 
-  async function loadAllData() {
+  async function loadSettingsData() {
+    if (
+      typeof chrome !== 'undefined' &&
+      chrome.storage &&
+      chrome.storage.sync &&
+      typeof chrome.storage.sync.get === 'function' &&
+      typeof Storage.getSettings === 'function'
+    ) {
+      try {
+        const directSettings = await Storage.getSettings();
+        if (directSettings && typeof directSettings === 'object') {
+          state.settings = cloneSettings(directSettings);
+          return;
+        }
+      } catch (_) {
+        // Fall through to service worker lookup
+      }
+    }
+
     const settingsResp = await sendRuntime(MSG.GET_SETTINGS, {});
     if (settingsResp && settingsResp.ok && settingsResp.settings) {
       state.settings = cloneSettings(settingsResp.settings);
     } else if (typeof Storage.getSettings === 'function') {
       state.settings = cloneSettings(await Storage.getSettings());
+    }
+  }
+
+  async function loadCustomCssData() {
+    if (
+      typeof chrome !== 'undefined' &&
+      chrome.storage &&
+      chrome.storage.local &&
+      typeof chrome.storage.local.get === 'function' &&
+      typeof Storage.getAllCustomCss === 'function'
+    ) {
+      try {
+        const directCss = await Storage.getAllCustomCss();
+        if (directCss && typeof directCss === 'object') {
+          state.customCssMap = Object.assign({}, directCss);
+          return;
+        }
+      } catch (_) {
+        // Fall through to service worker lookup
+      }
     }
 
     const cssResp = await sendRuntime(MSG.GET_ALL_CUSTOM_CSS, {});
@@ -387,40 +427,59 @@
     } else if (typeof Storage.getAllCustomCss === 'function') {
       state.customCssMap = Object.assign({}, await Storage.getAllCustomCss());
     }
+  }
 
-    await loadThemesRegistry();
-    await detectVivaldiEnvironment();
+  async function loadAllData() {
+    await Promise.all([
+      loadSettingsData(),
+      loadCustomCssData(),
+      loadThemesRegistry(),
+      detectVivaldiEnvironment()
+    ]);
+  }
+
+  async function fetchCurrentWindow() {
+    if (typeof chrome === 'undefined' || !chrome.windows || typeof chrome.windows.getCurrent !== 'function') {
+      return null;
+    }
+    try {
+      return await chrome.windows.getCurrent();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function fetchCurrentWindowTabs() {
+    if (typeof chrome === 'undefined' || !chrome.tabs || typeof chrome.tabs.query !== 'function') {
+      return null;
+    }
+    try {
+      return await chrome.tabs.query({ currentWindow: true });
+    } catch (_) {
+      return null;
+    }
   }
 
   async function detectVivaldiEnvironment() {
     let detected = typeof navigator !== 'undefined' && /Vivaldi/i.test(navigator.userAgent || '');
 
-    if (typeof chrome !== 'undefined' && chrome.windows && typeof chrome.windows.getCurrent === 'function') {
-      try {
-        const win = await chrome.windows.getCurrent();
-        if (win && typeof win.id === 'number') {
-          state.currentWindowId = win.id;
-        }
-      } catch (_) {
-        // Ignore window lookup errors
-      }
+    const [win, tabs] = await Promise.all([
+      fetchCurrentWindow(),
+      fetchCurrentWindowTabs()
+    ]);
+
+    if (win && typeof win.id === 'number') {
+      state.currentWindowId = win.id;
     }
 
-    if (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.query === 'function') {
-      try {
-        const tabs = await chrome.tabs.query({ currentWindow: true });
-        if (Array.isArray(tabs)) {
-          for (const t of tabs) {
-            if (t && typeof t === 'object' && 'vivExtData' in t) {
-              detected = true;
-            }
-            if (state.currentWindowId === null && t && typeof t.windowId === 'number') {
-              state.currentWindowId = t.windowId;
-            }
-          }
+    if (Array.isArray(tabs)) {
+      for (const t of tabs) {
+        if (t && typeof t === 'object' && 'vivExtData' in t) {
+          detected = true;
         }
-      } catch (_) {
-        // Ignore tab query errors
+        if (state.currentWindowId === null && t && typeof t.windowId === 'number') {
+          state.currentWindowId = t.windowId;
+        }
       }
     }
 
@@ -595,6 +654,10 @@
   }
 
   function renderThemesSection() {
+    if (state.themeSearchTimer) {
+      clearTimeout(state.themeSearchTimer);
+      state.themeSearchTimer = null;
+    }
     const filtered = getFilteredThemes();
     const disabledSet = new Set(state.settings.disabledThemes || []);
     const activeCount = state.themes.filter((t) => !disabledSet.has(t.id)).length;
@@ -602,6 +665,11 @@
 
     el.themesGrid.textContent = '';
     el.themesEmpty.classList.toggle('hidden', filtered.length > 0);
+
+    const fragment = typeof document.createDocumentFragment === 'function'
+      ? document.createDocumentFragment()
+      : null;
+    const container = fragment || el.themesGrid;
 
     for (const theme of filtered) {
       const isEnabled = !disabledSet.has(theme.id);
@@ -671,7 +739,11 @@
       card.appendChild(top);
       card.appendChild(desc);
       card.appendChild(domainWrap);
-      el.themesGrid.appendChild(card);
+      container.appendChild(card);
+    }
+
+    if (fragment) {
+      el.themesGrid.appendChild(fragment);
     }
   }
 
@@ -720,6 +792,10 @@
   }
 
   function renderSiteRulesSection() {
+    if (state.rulesSearchTimer) {
+      clearTimeout(state.rulesSearchTimer);
+      state.rulesSearchTimer = null;
+    }
     const rulesMap = state.settings.siteRules || {};
     const query = (el.rulesSearch.value || '').trim().toLowerCase();
     const hostnames = Object.keys(rulesMap)
@@ -728,6 +804,11 @@
 
     el.rulesTbody.textContent = '';
     el.rulesEmpty.classList.toggle('hidden', hostnames.length > 0);
+
+    const fragment = typeof document.createDocumentFragment === 'function'
+      ? document.createDocumentFragment()
+      : null;
+    const container = fragment || el.rulesTbody;
 
     for (const hostname of hostnames) {
       const rule = rulesMap[hostname] || { enabled: true, mode: 'auto' };
@@ -822,7 +903,11 @@
       tr.appendChild(tdForce);
       tr.appendChild(tdEnabled);
       tr.appendChild(tdActions);
-      el.rulesTbody.appendChild(tr);
+      container.appendChild(tr);
+    }
+
+    if (fragment) {
+      el.rulesTbody.appendChild(fragment);
     }
   }
 
@@ -1195,6 +1280,19 @@
     }
   }
 
+  /** Create a debounced event listener using a named timer slot in state. */
+  function createDebouncedHandler(timerKey, delayMs, fn) {
+    return function onDebouncedInput() {
+      if (state[timerKey]) {
+        clearTimeout(state[timerKey]);
+      }
+      state[timerKey] = setTimeout(function onDebouncedTimeout() {
+        state[timerKey] = null;
+        fn();
+      }, delayMs);
+    };
+  }
+
   function bindEvents() {
     // Sidebar section navigation
     el.sidebarNav.addEventListener('click', function onNavClick(event) {
@@ -1285,7 +1383,7 @@
     });
 
     // Supported Site Themes
-    el.themeSearch.addEventListener('input', renderThemesSection);
+    el.themeSearch.addEventListener('input', createDebouncedHandler('themeSearchTimer', 80, renderThemesSection));
     el.themeCategoryFilter.addEventListener('change', renderThemesSection);
     el.btnEnableAllThemes.addEventListener('click', async function onEnableAllClick() {
       await setAllFilteredThemes(true);
@@ -1313,7 +1411,7 @@
       el.ruleForceNative.checked = false;
       showToast(`Saved rule for ${hostname}.`, 'success');
     });
-    el.rulesSearch.addEventListener('input', renderSiteRulesSection);
+    el.rulesSearch.addEventListener('input', createDebouncedHandler('rulesSearchTimer', 80, renderSiteRulesSection));
 
     // Schedule & Automation
     el.scheduleModes.addEventListener('change', async function onScheduleModeChange(event) {
