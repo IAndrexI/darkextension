@@ -3,20 +3,56 @@
 html[data-darkext-active="true"][data-darkext-site="amazon"] {
   color-scheme: dark;
   background-color: var(--de-bg) !important;
+  background-image: none !important;
   color: var(--de-text) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] body,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #a-page,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #pageContent,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #gw-layout,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .gw-layout {
+  background-image: none !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] body,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #a-page,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #pageContent,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #main-content,
+html[data-darkext-active="true"][data-darkext-site="amazon"] main,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [role="main"],
 html[data-darkext-active="true"][data-darkext-site="amazon"] #dp,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #dp-container,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #ppd,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #search,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-desktop-width-max,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .s-desktop-content,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-container,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #gw-layout {
+html[data-darkext-active="true"][data-darkext-site="amazon"] #gw-layout,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .gw-layout,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #gw-content-grid,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #gw-main-container,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #gw-desktop-herotator,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .gw-desktop-herotator,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #desktop-grid-1,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #desktop-grid-2,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #desktop-grid-3,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #desktop-grid-4,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .desktop-btf-grid,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .desktop-app,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #contentGrid,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .bxc-grid-container,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid="grid-deals-container"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid="virtuoso-item-list"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="DesktopGrid"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="GridContainer"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="DesktopDiscountAsinGrid"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="GridRow-module"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="DesktopRefinements"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="Refinements-module"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="FilterBar"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="BubblesContainer"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="BubbleCarousel"] {
   background-color: var(--de-bg) !important;
   color: var(--de-text) !important;
 }
@@ -109,6 +145,10 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-subnav {
 html[data-darkext-active="true"][data-darkext-site="amazon"] #navbar a,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-belt a,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-main a,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-main .nav-a,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-main .nav-a span,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-xshop a,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-xshop a span,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-subnav a,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-subnav .nav-a-content,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #navbar .nav-line-1,
@@ -161,17 +201,22 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] #twotabsearchtextbo
   color: var(--de-text-muted) !important;
 }
 
-html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-submit,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-submit-text {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-submit {
   background-image: none !important;
   background-color: #f3a847 !important;
   border: none !important;
   color: #111111 !important;
 }
 
-html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-submit:hover,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-submit-text:hover {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-submit:hover {
   background-color: #febd69 !important;
+}
+
+/* Keep Amazon's dark magnifying glass background sprite visible on #nav-search-submit-text */
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-submit-text {
+  background-color: transparent !important;
+  border: none !important;
+  color: #111111 !important;
 }
 
 /* Keep the transparent submit input overlay from hiding the magnifying glass sprite */
@@ -237,12 +282,51 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .puis-card-containe
 html[data-darkext-active="true"][data-darkext-site="amazon"] .puis-card-border,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-container,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-border,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel-card {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel-card,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid="product-card"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid*="deal-card"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="ProductCard-module"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="DealCard-module"] {
   background-color: var(--de-bg-elevated) !important;
   border: 1px solid var(--de-border-strong) !important;
   border-radius: 8px;
   color: var(--de-text) !important;
   box-shadow: var(--de-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.45)) !important;
+}
+
+/* Deals category filter pills & deal countdown badge labels */
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid*="filter-bubble"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid*="bubble"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="Bubble-module"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="FilterBubble"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [role="tablist"] button,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [role="tab"] {
+  background-color: var(--de-bg-subtle) !important;
+  border: 1px solid var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid*="filter-bubble"][aria-selected="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid*="filter-bubble"][aria-pressed="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid*="bubble"][aria-selected="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [data-testid*="bubble"][aria-pressed="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="Bubble-module"][aria-selected="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="Bubble-module"][aria-pressed="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="FilterBubble"][aria-selected="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="FilterBubble"][aria-pressed="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [role="tablist"] button[aria-selected="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [role="tablist"] button[aria-pressed="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [role="tab"][aria-selected="true"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [role="tab"][aria-current="true"] {
+  border-color: var(--de-accent) !important;
+  background-color: var(--de-bg-hover) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="BadgeMessaging"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="badgeLabel"] {
+  background-color: transparent !important;
+  color: var(--de-text) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-box .a-box-inner,
@@ -457,6 +541,12 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] textarea::placehold
   color: var(--de-text-muted) !important;
 }
 
+html[data-darkext-active="true"][data-darkext-site="amazon"] input[type="checkbox"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] input[type="radio"] {
+  color-scheme: dark;
+  accent-color: var(--de-accent) !important;
+}
+
 /* Tables, specs, and dividers */
 html[data-darkext-active="true"][data-darkext-site="amazon"] table,
 html[data-darkext-active="true"][data-darkext-site="amazon"] table.a-bordered,
@@ -545,10 +635,42 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-pagination li.a-
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-goto-prevpage,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-goto-nextpage,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-carousel {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-carousel,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-control,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-left,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-right,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel-control,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="carousel-control"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="CarouselControl"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="CarouselArrow"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="carousel-arrow"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="ArrowButton"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="arrow-button"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="ScrollButton"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="scroll-button"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] button[aria-label*="Previous" i],
+html[data-darkext-active="true"][data-darkext-site="amazon"] button[aria-label*="Next" i],
+html[data-darkext-active="true"][data-darkext-site="amazon"] a[aria-label*="Previous" i],
+html[data-darkext-active="true"][data-darkext-site="amazon"] a[aria-label*="Next" i] {
   background-color: var(--de-bg-subtle) !important;
-  border-color: var(--de-border-strong) !important;
+  background-image: none !important;
+  border: 1px solid var(--de-border-strong) !important;
   color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-goto-prevpage svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-goto-nextpage svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-control svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel-control svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="CarouselControl"] svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="CarouselArrow"] svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="ArrowButton"] svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="ScrollButton"] svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] button[aria-label*="Previous" i] svg,
+html[data-darkext-active="true"][data-darkext-site="amazon"] button[aria-label*="Next" i] svg {
+  color: var(--de-text) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
 /* Footer */
@@ -567,10 +689,40 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .navFooterBackToTop
   color: var(--de-text) !important;
 }
 
-/* Protect product images, star sprites, Prime badges, and media; brighten monochrome UI icons */
+/* Protect product images, star sprites, Prime badges, and media; neutralize multiply blackouts */
 html[data-darkext-active="true"][data-darkext-site="amazon"] img,
 html[data-darkext-active="true"][data-darkext-site="amazon"] video {
   filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] img,
+html[data-darkext-active="true"][data-darkext-site="amazon"] picture,
+html[data-darkext-active="true"][data-darkext-site="amazon"] video,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-dynamic-image,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .s-image,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="image"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="Image"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="quad"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="Quad"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="product-image"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="ProductImage"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-image-container {
+  mix-blend-mode: normal !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-image-container::after,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="product-image"]::after,
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="ProductImage"]::after,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="image"]::after,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="Image"]::after,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="quad"]::after,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="Quad"]::after,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="image-overlay"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui [class*="imageOverlay"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="quad"] [class*="image-overlay"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="product-image"] [class*="overlay"] {
+  mix-blend-mode: normal !important;
+  background-color: transparent !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon,
@@ -590,8 +742,19 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-next,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-previous,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-extender-expand,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-extender-collapse,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-search {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-search,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-goto-prevpage .a-icon,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-goto-nextpage .a-icon,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-control .a-icon,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel-control .a-icon {
   filter: invert(0.88) brightness(1.15) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="Radio-module"] [class*="icon"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] [class*="Checkbox-module"] [class*="icon"],
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-checkbox,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-radio {
+  filter: invert(0.88) hue-rotate(180deg) brightness(1.05) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"][data-darkext-dim-images="true"] .s-image,

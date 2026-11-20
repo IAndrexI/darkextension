@@ -186,3 +186,10 @@ html[data-darkext-active="true"]:not([data-darkext-mode="filter"])[data-darkext-
 html[data-darkext-active="true"]:not([data-darkext-mode="filter"])[data-darkext-dim-images="true"] video {
   filter: brightness(var(--de-image-brightness, 0.9));
 }
+
+/* Prevent light-mode multiply blend modes from turning product photos solid black on dark cards */
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) img,
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) picture,
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) video {
+  mix-blend-mode: normal !important;
+}

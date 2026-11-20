@@ -3,12 +3,14 @@
 (function initDynamicEngine(global) {
   const DarkExt = (global.DarkExt = global.DarkExt || {});
 
-  const MICRO_BATCH_SIZE = 64;
-  const FRAME_BUDGET_MS = 8;
-  const MAX_NODES_PER_FRAME = 256;
+  const FRAME_BUDGET_MS = 16;
+  const SYNC_PASS_BUDGET_MS = 18;
+  const MAX_NODES_PER_FRAME = 1500;
+  const MAX_NODES_PER_SYNC_PASS = 1200;
+  const TIME_CHECK_INTERVAL = 32;
   const QUEUE_COMPACT_THRESHOLD = 512;
   const MAX_VIBRANT_CACHE_SIZE = 512;
-  const MUTATION_DEBOUNCE_MS = 100;
+  const MUTATION_DEBOUNCE_MS = 32;
   const TOAST_DURATION_MS = 2200;
 
   const RUNTIME_VARS_STYLE_ID = 'darkext-runtime-vars';
@@ -63,6 +65,7 @@
     ['backgroundColor', 'background-color'],
     ['backgroundImage', 'background-image'],
     ['color', 'color'],
+    ['mixBlendMode', 'mix-blend-mode'],
     ['borderTopColor', 'border-top-color'],
     ['borderRightColor', 'border-right-color'],
     ['borderBottomColor', 'border-bottom-color'],
@@ -75,6 +78,8 @@
   let mutationDebounceTimer = null;
   let toastDismissTimer = null;
   let toastRemoveTimer = null;
+  let syncWindowStart = 0;
+  let syncWindowSpentMs = 0;
 
   let pendingQueue = [];
   let queueHead = 0;
@@ -441,8 +446,28 @@
 
     const hasSelfVibrantBg = Boolean(bg && bg.a >= 0.2 && isVibrantBrandColor(bg, ColorUtils));
     const lightGradient = hasBgImg && !hasBgUrlImage && !hasSelfVibrantBg && hasLightCssGradient(style, ColorUtils);
+    const blendMode = style.mixBlendMode;
+    const isDarkeningBlend =
+      blendMode === 'multiply' || blendMode === 'darken' || blendMode === 'color-burn';
+    const hasDirectText = Boolean(el.textContent && el.textContent.trim());
+    const hasLightNonVibrantBg = Boolean(
+      bg && bg.a >= 0.08 && bgLum !== null && bgLum > 0.13 && !hasSelfVibrantBg
+    );
 
-    if (lightGradient) {
+    if (isDarkeningBlend) {
+      plan.mixBlendMode = 'normal';
+      hasChanges = true;
+      // Neutralize light-mode tint overlays rather than turning them opaque black
+      if (!hasDirectText && (hasLightNonVibrantBg || lightGradient)) {
+        plan.backgroundColor = 'transparent';
+        if (lightGradient) {
+          plan.backgroundImage = 'none';
+        }
+        bgDarkened = true;
+      }
+    }
+
+    if (!bgDarkened && lightGradient) {
       plan.backgroundImage = 'none';
       if (submitOrSearch && !isSiteThemeSweep && presetColors.accent) {
         plan.backgroundColor = presetColors.accent;
@@ -498,6 +523,30 @@
           plan.color = lightFg;
           hasChanges = true;
         }
+      }
+    } else if (
+      !bgDarkened &&
+      hasBgUrlImage &&
+      bg &&
+      bg.a >= 0.5 &&
+      bgLum !== null &&
+      bgLum > 0.13 &&
+      !hasSelfVibrantBg &&
+      (tag === 'HTML' ||
+        tag === 'BODY' ||
+        tag === 'MAIN' ||
+        tag === 'SECTION' ||
+        (tag === 'DIV' &&
+          el.children &&
+          el.children.length > 0 &&
+          (style.backgroundRepeat === 'no-repeat' || style.backgroundRepeat === 'no-repeat no-repeat')))
+    ) {
+      // Darken exposed white side margins behind centered hero banners without altering background-image
+      const darkBg = ColorUtils.darkenBackgroundColor(bg, presetColors);
+      if (darkBg) {
+        plan.backgroundColor = darkBg;
+        bgDarkened = true;
+        hasChanges = true;
       }
     }
 
@@ -720,103 +769,118 @@
     rafId = scheduleRaf(processBatch);
   }
 
-  function processBatch() {
-    rafId = null;
+  function runSweepPass(budgetMs, maxNodes) {
     if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
       clearPendingQueue();
-      return;
+      return 0;
     }
 
     const win = typeof window !== 'undefined' ? window : global;
     const ColorUtils = getColorUtils();
     if (!win || typeof win.getComputedStyle !== 'function' || !ColorUtils) {
       clearPendingQueue();
-      return;
+      return 0;
+    }
+
+    // Pre-read restore pass so no DOM writes occur during style reads
+    const scanLimit = Math.min(pendingQueue.length, queueHead + maxNodes);
+    for (let scanIdx = queueHead; scanIdx < scanLimit; scanIdx += 1) {
+      const scanEl = pendingQueue[scanIdx];
+      if (scanEl && scanEl.isConnected && appliedStyles.has(scanEl)) {
+        restoreElementStyles(scanEl);
+      }
     }
 
     const presetColors = getPresetColors(currentConfig.preset);
     const planOptions = { siteThemeSweep: currentConfig.mode === 'site-theme' };
     const styleCache = new Map();
     const ancestorBgCache = new Map();
+    const writes = [];
 
-    const frameStart = nowMs();
-    let totalProcessed = 0;
+    const passStart = nowMs();
+    let processed = 0;
 
-    while (
-      queueHead < pendingQueue.length &&
-      totalProcessed < MAX_NODES_PER_FRAME &&
-      (totalProcessed === 0 || nowMs() - frameStart < FRAME_BUDGET_MS)
-    ) {
-      const microLimit = Math.min(MICRO_BATCH_SIZE, MAX_NODES_PER_FRAME - totalProcessed);
-      const batch = [];
-
-      while (batch.length < microLimit && queueHead < pendingQueue.length) {
-        const el = pendingQueue[queueHead];
-        pendingQueue[queueHead] = undefined;
-        queueHead += 1;
-        queuedSet.delete(el);
-        if (!el || !el.isConnected || shouldSkipElement(el)) {
-          continue;
-        }
-        if (el.style && el.style.display === 'none') {
-          hiddenSkippedSet.add(el);
-          continue;
-        }
-        // If previously styled and re-queued due to mutation, restore original before reading site style
-        if (appliedStyles.has(el)) {
-          restoreElementStyles(el);
-          styleCache.delete(el);
-          ancestorBgCache.delete(el);
-        }
-        batch.push(el);
-      }
-
-      if (batch.length === 0) {
+    // Single read phase across up to maxNodes elements
+    while (queueHead < pendingQueue.length && processed < maxNodes) {
+      if (processed > 0 && (processed & (TIME_CHECK_INTERVAL - 1)) === 0 && nowMs() - passStart >= budgetMs) {
         break;
       }
 
-      // Read phase: compute all styles before mutating DOM to prevent layout thrashing
-      const writes = [];
-      for (let i = 0; i < batch.length; i += 1) {
-        const el = batch[i];
-        const computed = getComputedStyleCached(el, win, styleCache);
-        if (!computed) continue;
-        if (computed.display === 'none') {
-          hiddenSkippedSet.add(el);
-          continue;
-        }
-        const plan = computeDarkeningPlan(
-          el,
-          computed,
-          presetColors,
-          win,
-          ColorUtils,
-          planOptions,
-          styleCache,
-          ancestorBgCache
-        );
-        if (plan !== null) {
-          writes.push([el, plan]);
-        }
+      const el = pendingQueue[queueHead];
+      pendingQueue[queueHead] = undefined;
+      queueHead += 1;
+      queuedSet.delete(el);
+
+      if (!el || !el.isConnected || shouldSkipElement(el)) {
+        continue;
+      }
+      if (el.style && el.style.display === 'none') {
+        hiddenSkippedSet.add(el);
+        continue;
       }
 
-      // Write phase
-      for (let i = 0; i < writes.length; i += 1) {
-        const [el, plan] = writes[i];
-        if (el.isConnected) {
-          applyPlanToElement(el, plan);
-          if (plan.backgroundColor || plan.backgroundImage) {
-            styleCache.delete(el);
-            ancestorBgCache.delete(el);
-          }
-        }
+      const computed = getComputedStyleCached(el, win, styleCache);
+      if (!computed) {
+        continue;
+      }
+      if (computed.display === 'none') {
+        hiddenSkippedSet.add(el);
+        continue;
       }
 
-      totalProcessed += batch.length;
+      const plan = computeDarkeningPlan(
+        el,
+        computed,
+        presetColors,
+        win,
+        ColorUtils,
+        planOptions,
+        styleCache,
+        ancestorBgCache
+      );
+      if (plan !== null) {
+        writes.push([el, plan]);
+        if (plan.backgroundColor && plan.backgroundColor !== 'transparent') {
+          ancestorBgCache.set(el, DARKENED_BG_INFO);
+        }
+      }
+      processed += 1;
+    }
+
+    // Single write phase: apply all computed inline styles in one atomic paint frame
+    for (let i = 0; i < writes.length; i += 1) {
+      const [el, plan] = writes[i];
+      if (el.isConnected) {
+        applyPlanToElement(el, plan);
+      }
     }
 
     compactQueue();
     if (queueHead < pendingQueue.length) {
+      scheduleBatchProcessing();
+    }
+    return nowMs() - passStart;
+  }
+
+  function processBatch() {
+    rafId = null;
+    runSweepPass(FRAME_BUDGET_MS, MAX_NODES_PER_FRAME);
+  }
+
+  function runPrePaintSyncPass() {
+    if (!active || !currentConfig || !isSweepMode(currentConfig.mode) || queueHead >= pendingQueue.length) {
+      return;
+    }
+    const now = nowMs();
+    if (now - syncWindowStart >= 16) {
+      syncWindowStart = now;
+      syncWindowSpentMs = 0;
+    }
+    const remainingBudget = SYNC_PASS_BUDGET_MS - syncWindowSpentMs;
+    if (remainingBudget > 2) {
+      const spent = runSweepPass(remainingBudget, MAX_NODES_PER_SYNC_PASS);
+      syncWindowSpentMs += spent;
+    } else {
       scheduleBatchProcessing();
     }
   }
@@ -866,7 +930,17 @@
       }
     }
 
-    if (addedSubtreeBuffer.size === 0 && attrTargetBuffer.size === 0) {
+    if (addedSubtreeBuffer.size > 0) {
+      for (const el of addedSubtreeBuffer) {
+        if (el && el.isConnected && !shouldSkipElement(el)) {
+          enqueueSubtree(el);
+        }
+      }
+      addedSubtreeBuffer.clear();
+      runPrePaintSyncPass();
+    }
+
+    if (attrTargetBuffer.size === 0) {
       return;
     }
 
@@ -1152,6 +1226,8 @@
     }
     clearPendingQueue();
     vibrantColorCache.clear();
+    syncWindowStart = 0;
+    syncWindowSpentMs = 0;
 
     stopMutationObservers();
     uninstallSpaHooks();
@@ -1204,8 +1280,12 @@
     if (isSweepMode(currentConfig.mode)) {
       startMutationObserver();
       if (typeof document !== 'undefined' && document.documentElement) {
+        syncWindowStart = 0;
+        syncWindowSpentMs = 0;
         enqueueSubtree(document.documentElement);
-        scheduleBatchProcessing();
+        runSweepPass(SYNC_PASS_BUDGET_MS, MAX_NODES_PER_SYNC_PASS);
+        syncWindowStart = 0;
+        syncWindowSpentMs = 0;
       }
     }
   }
@@ -1323,7 +1403,7 @@
     }
     if (typeof document !== 'undefined' && document.documentElement) {
       enqueueSubtree(document.documentElement);
-      scheduleBatchProcessing();
+      runPrePaintSyncPass();
     }
   }
 

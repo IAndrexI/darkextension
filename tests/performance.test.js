@@ -245,8 +245,11 @@ function createMockDomHarness(options = {}) {
         {
           display: 'block',
           visibility: 'visible',
+          position: 'static',
           backgroundColor: 'rgba(0, 0, 0, 0)',
           backgroundImage: 'none',
+          backgroundRepeat: 'repeat',
+          mixBlendMode: 'normal',
           color: 'rgb(17, 17, 17)',
           opacity: '1',
           boxShadow: 'none',
@@ -960,19 +963,13 @@ describe('DynamicEngine Structural & Functional Optimization Checks', () => {
     assert.equal(DynamicEngine.isActive(), true);
     assert.equal(DynamicEngine.getMode(), 'dynamic');
     assert.equal(dom.html.getAttribute('data-darkext-active'), 'true');
-    assert.ok(dom.rafQueue.size > 0, 'apply() must schedule animation frame batch processing');
-
-    // Run 1 frame first: 300+ elements should exceed per-frame cap so queue continues cleanly
-    dom.flushFrames(1);
-    const styledAfterOneFrame = bulkNodes.filter((n) => n.hasAttribute('data-darkext-styled')).length;
-    assert.ok(
-      styledAfterOneFrame > 0 && styledAfterOneFrame < bulkNodes.length,
-      `Expected frame cap to split 300+ nodes across frames, styled ${styledAfterOneFrame} in frame 1`
+    // First-paint viewport (300 nodes) should be darkened atomically inside apply() with zero frame crawl
+    const styledAtApply = bulkNodes.filter((n) => n.getAttribute('data-darkext-styled') === '1').length;
+    assert.equal(
+      styledAtApply,
+      bulkNodes.length,
+      `Expected all ${bulkNodes.length} initial viewport nodes darkened synchronously on apply(), got ${styledAtApply}`
     );
-
-    // Finish remaining frames
-    dom.flushFrames(20);
-    assert.equal(dom.rafQueue.size, 0, 'All queued nodes should finish draining');
 
     assert.equal(card.getAttribute('data-darkext-styled'), '1');
     assert.ok(card.style.getPropertyValue('background-color'), 'Light card background should be darkened');
@@ -989,7 +986,7 @@ describe('DynamicEngine Structural & Functional Optimization Checks', () => {
       `Expected batch style/ancestor cache to keep card getComputedStyle calls <= 4, got ${cardStyleCalls}`
     );
 
-    // Mutation test 1: childList mutation enqueues full added subtree
+    // Mutation test 1: childList mutation enqueues and darkens newly inserted subtree immediately pre-paint
     const dynParent = dom.createMockElement('div', {
       backgroundColor: 'rgb(255, 255, 255)',
       color: 'rgb(20, 20, 20)',
@@ -1002,11 +999,17 @@ describe('DynamicEngine Structural & Functional Optimization Checks', () => {
     dom.body.appendChild(dynParent);
 
     dom.triggerMutations([{ type: 'childList', addedNodes: [dynParent] }]);
-    dom.flushTimers();
-    dom.flushFrames(10);
 
-    assert.equal(dynParent.getAttribute('data-darkext-styled'), '1');
-    assert.equal(dynChild.getAttribute('data-darkext-styled'), '1');
+    assert.equal(
+      dynParent.getAttribute('data-darkext-styled'),
+      '1',
+      'childList added parent must darken immediately pre-paint without waiting for debounce timer'
+    );
+    assert.equal(
+      dynChild.getAttribute('data-darkext-styled'),
+      '1',
+      'childList added child must darken immediately pre-paint without waiting for debounce timer'
+    );
 
     // Mutation test 2: attributes mutation enqueues ONLY target element, not its subtree children
     const attrParent = dom.createMockElement('div', {
@@ -1054,6 +1057,119 @@ describe('DynamicEngine Structural & Functional Optimization Checks', () => {
     });
     dom.flushFrames(20);
     assert.equal(card.getAttribute('data-darkext-styled'), '1');
+    DynamicEngine.teardown();
+
+    // Very large DOM (> 1,200 node sync cap) schedules rAF spillover and drains cleanly
+    const massiveNodes = [];
+    for (let i = 0; i < 1600; i += 1) {
+      const node = dom.createMockElement('div', {
+        backgroundColor: 'rgb(255, 255, 255)',
+        color: 'rgb(17, 17, 17)',
+      });
+      dom.body.appendChild(node);
+      massiveNodes.push(node);
+    }
+    DynamicEngine.apply({
+      mode: 'dynamic',
+      preset: 'midnight',
+      dimImages: false,
+      imageBrightness: 100,
+    });
+    assert.ok(dom.rafQueue.size > 0, 'DOMs exceeding MAX_NODES_PER_SYNC_PASS must schedule rAF spillover');
+    const styledAfterSync = massiveNodes.filter((n) => n.hasAttribute('data-darkext-styled')).length;
+    assert.ok(
+      styledAfterSync > 0 && styledAfterSync < massiveNodes.length,
+      `Expected partial sync + rAF continuation for 1600+ nodes, got ${styledAfterSync} styled initially`
+    );
+    dom.flushFrames(20);
+    assert.equal(dom.rafQueue.size, 0, 'Remaining nodes must finish draining across animation frames');
+    assert.equal(massiveNodes[massiveNodes.length - 1].getAttribute('data-darkext-styled'), '1');
+    DynamicEngine.teardown();
+  });
+
+  it('neutralizes mix-blend-mode: multiply on media wrappers & light tint overlays and restores cleanly', () => {
+    const { DynamicEngine, dom } = loadDynamicEngineInMockDom();
+
+    const imgWrap = dom.createMockElement('div', {
+      mixBlendMode: 'multiply',
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+    });
+    const prodImg = dom.createMockElement('img');
+    imgWrap.appendChild(prodImg);
+    dom.body.appendChild(imgWrap);
+
+    const tintOverlay = dom.createMockElement('div', {
+      mixBlendMode: 'multiply',
+      backgroundColor: 'rgb(247, 247, 247)',
+      position: 'absolute',
+    });
+    dom.body.appendChild(tintOverlay);
+
+    DynamicEngine.apply({
+      mode: 'site-theme',
+      preset: 'oled',
+      siteThemeId: 'amazon',
+      dimImages: true,
+      imageBrightness: 90,
+    });
+    dom.flushFrames(5);
+
+    assert.equal(imgWrap.style.getPropertyValue('mix-blend-mode'), 'normal');
+    assert.equal(tintOverlay.style.getPropertyValue('mix-blend-mode'), 'normal');
+    assert.equal(
+      tintOverlay.style.getPropertyValue('background-color'),
+      'transparent',
+      'Empty multiply light tint overlay must become transparent instead of opaque black'
+    );
+
+    DynamicEngine.teardown();
+    assert.equal(imgWrap.style.getPropertyValue('mix-blend-mode'), '');
+    assert.equal(tintOverlay.style.getPropertyValue('background-color'), '');
+    assert.equal(tintOverlay.style.getPropertyValue('mix-blend-mode'), '');
+  });
+
+  it('darkens exposed white side margins on centered hero url(...) containers without touching leaf sprites', () => {
+    const { DynamicEngine, dom } = loadDynamicEngineInMockDom();
+
+    const heroWrapper = dom.createMockElement('div', {
+      backgroundImage: 'url("https://example.com/hero.jpg")',
+      backgroundRepeat: 'no-repeat',
+      backgroundColor: 'rgb(255, 255, 255)',
+    });
+    heroWrapper.appendChild(dom.createMockElement('a'));
+    dom.body.appendChild(heroWrapper);
+
+    const leafSprite = dom.createMockElement('div', {
+      backgroundImage: 'url("https://example.com/sprite.png")',
+      backgroundRepeat: 'no-repeat',
+      backgroundColor: 'rgb(255, 255, 255)',
+    });
+    dom.body.appendChild(leafSprite);
+
+    DynamicEngine.apply({
+      mode: 'site-theme',
+      preset: 'midnight',
+      siteThemeId: 'amazon',
+      dimImages: false,
+      imageBrightness: 100,
+    });
+    dom.flushFrames(5);
+
+    assert.ok(
+      heroWrapper.style.getPropertyValue('background-color'),
+      'Centered hero url(...) container with white side margins must have background-color darkened'
+    );
+    assert.equal(
+      heroWrapper.style.getPropertyValue('background-image'),
+      '',
+      'Hero container background-image must remain intact'
+    );
+    assert.equal(
+      leafSprite.style.getPropertyValue('background-color'),
+      '',
+      'Empty leaf url(...) sprite element must not have its background altered'
+    );
+
     DynamicEngine.teardown();
   });
 });
@@ -1441,6 +1557,29 @@ describe('Startup, Broadcast & CSS Performance Audits', () => {
     for (const cssVar of requiredVars) {
       assert.ok(varsCss.includes(cssVar), `variables.css missing CSS variable ${cssVar}`);
     }
+
+    assert.match(
+      varsCss,
+      /img\s*,[\s\S]*?picture\s*,[\s\S]*?video\s*\{[^}]*mix-blend-mode:\s*normal\s*!important/,
+      'variables.css must force mix-blend-mode: normal !important on img, picture, video'
+    );
+  });
+
+  it('amazon.css protects search icon sprite, Deals/Gateway layouts, carousel controls, and blend modes', () => {
+    const amazonCss = readRepoFile('src/themes/sites/amazon.css');
+    assert.ok(amazonCss.includes('[data-testid="grid-deals-container"]'), 'amazon.css must style [data-testid="grid-deals-container"]');
+    assert.ok(amazonCss.includes('#gw-content-grid'), 'amazon.css must style #gw-content-grid');
+    assert.ok(amazonCss.includes('.feed-carousel-control'), 'amazon.css must style carousel arrow controls');
+    assert.ok(amazonCss.includes('mix-blend-mode: normal !important'), 'amazon.css must enforce mix-blend-mode: normal !important');
+
+    const submitTextBlockRe = /html\[data-darkext-active="true"\]\[data-darkext-site="amazon"\]\s+#nav-search-submit-text\s*\{([^}]*)\}/;
+    const submitTextMatch = submitTextBlockRe.exec(amazonCss);
+    assert.ok(submitTextMatch, 'amazon.css must define #nav-search-submit-text rule');
+    assert.equal(
+      /background-image\s*:\s*none/i.test(submitTextMatch[1]),
+      false,
+      'amazon.css #nav-search-submit-text must NOT hide Amazon magnifying glass sprite with background-image: none'
+    );
   });
 
   it('popup.js and options.js parallelize init with Promise.all and options.js debounces search inputs', () => {
