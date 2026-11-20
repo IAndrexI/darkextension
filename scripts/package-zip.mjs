@@ -9,7 +9,14 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
 const OUTPUT_ZIP = path.join(DIST_DIR, 'darkextension.zip');
 
-const EXCLUDED_TOP_LEVEL = new Set(['.git', 'tests', 'scripts', 'dist', 'node_modules']);
+const EXCLUDED_TOP_LEVEL = new Set([
+  '.git',
+  'tests',
+  'scripts',
+  'dist',
+  'node_modules',
+  'install-vivaldi.bat'
+]);
 const EXCLUDED_NAMES = new Set(['.DS_Store', 'Thumbs.db']);
 
 function buildCrc32Table() {

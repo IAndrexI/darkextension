@@ -270,6 +270,11 @@ async function setupContextMenus() {
     contexts: ['page']
   });
   createContextMenuItem({
+    id: CONTEXT_MENU_IDS.OPEN_SIDE_PANEL,
+    title: 'Open DarkExtension Side Panel',
+    contexts: ['page', 'action']
+  });
+  createContextMenuItem({
     id: CONTEXT_MENU_IDS.OPEN_OPTIONS,
     title: 'DarkExtension Settings',
     contexts: ['page', 'action']
@@ -481,8 +486,12 @@ async function handleMessage(message, sender) {
         return { ok: false, error: 'Missing target tabId for CSS injection' };
       }
       if (files.length > 0 && chrome.scripting && typeof chrome.scripting.insertCSS === 'function') {
+        const target = { tabId };
+        if (sender && typeof sender.frameId === 'number') {
+          target.frameIds = [sender.frameId];
+        }
         await chrome.scripting.insertCSS({
-          target: { tabId },
+          target,
           files
         });
       }
@@ -497,8 +506,12 @@ async function handleMessage(message, sender) {
       }
       if (files.length > 0 && chrome.scripting && typeof chrome.scripting.removeCSS === 'function') {
         try {
+          const target = { tabId };
+          if (sender && typeof sender.frameId === 'number') {
+            target.frameIds = [sender.frameId];
+          }
           await chrome.scripting.removeCSS({
-            target: { tabId },
+            target,
             files
           });
         } catch {
@@ -563,6 +576,29 @@ if (chrome.runtime && chrome.runtime.onStartup) {
 if (chrome.contextMenus && chrome.contextMenus.onClicked) {
   chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const menuId = info && info.menuItemId;
+
+    if (menuId === CONTEXT_MENU_IDS.OPEN_SIDE_PANEL) {
+      if (chrome.sidePanel && typeof chrome.sidePanel.open === 'function') {
+        try {
+          if (tab && typeof tab.windowId === 'number') {
+            await chrome.sidePanel.open({ windowId: tab.windowId });
+            return;
+          }
+          const fallbackTab = await getActiveTab();
+          if (fallbackTab && typeof fallbackTab.windowId === 'number') {
+            await chrome.sidePanel.open({ windowId: fallbackTab.windowId });
+            return;
+          }
+        } catch {
+          // Fall through to options page if sidePanel is unavailable or gesture expired
+        }
+      }
+      if (chrome.runtime && typeof chrome.runtime.openOptionsPage === 'function') {
+        await chrome.runtime.openOptionsPage();
+      }
+      return;
+    }
+
     const activeTab = tab || (await getActiveTab());
     const tabId = activeTab && activeTab.id;
     const tabUrl = (activeTab && activeTab.url) || '';

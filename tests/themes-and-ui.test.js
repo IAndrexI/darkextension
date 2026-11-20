@@ -558,6 +558,15 @@ describe('UI HTML/CSS & MV3 JavaScript Compliance', () => {
       assert.ok(fs.existsSync(cssAbs), `Missing UI CSS file: ${cssRel}`);
       assertBalancedCssBraces(fs.readFileSync(cssAbs, 'utf8'), cssRel);
     }
+
+    // Verify Vivaldi & Side/Web Panel integration assets and hooks
+    const optionsHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
+    assert.ok(optionsHtml.includes('id="section-vivaldi"'), 'options.html must include section-vivaldi');
+    const popupJs = fs.readFileSync(path.join(ROOT, 'src/popup/popup.js'), 'utf8');
+    assert.ok(popupJs.includes('chrome.sidePanel'), 'popup.js must support chrome.sidePanel');
+    assert.ok(popupJs.includes('chrome.tabs.onActivated'), 'popup.js must track active tab switches');
+    assert.ok(fs.existsSync(path.join(ROOT, 'install-vivaldi.bat')), 'install-vivaldi.bat must exist');
+    assert.ok(fs.existsSync(path.join(ROOT, 'scripts/setup-vivaldi.ps1')), 'scripts/setup-vivaldi.ps1 must exist');
   });
 
   it('all JS/MJS files in src/ and scripts/ pass syntax check and MV3 security/async rules', () => {

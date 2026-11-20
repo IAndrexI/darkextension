@@ -46,12 +46,17 @@
     settings: Object.assign({}, DEFAULTS),
     effectiveEnabled: true,
     tabId: null,
+    windowId: null,
+    isVivaldi: false,
     tabUrl: '',
     hostname: '',
     supported: false,
     tabStatus: null,
     debounceTimer: null,
-    pendingPatch: {}
+    pendingPatch: {},
+    tabRefreshTimer: null,
+    tabRefreshInFlight: null,
+    pendingTabRefresh: false
   };
 
   const el = {};
@@ -59,6 +64,7 @@
   function cacheElements() {
     el.globalToggle = document.getElementById('global-toggle');
     el.globalStateLabel = document.getElementById('global-state-label');
+    el.btnOpenSidepanel = document.getElementById('btn-open-sidepanel');
     el.btnOpenOptions = document.getElementById('btn-open-options');
     el.statusBanner = document.getElementById('status-banner');
     el.siteCard = document.querySelector('.site-card');
@@ -134,19 +140,46 @@
     return false;
   }
 
+  function detectIsVivaldi(tab) {
+    const uaVivaldi = typeof navigator !== 'undefined' && /Vivaldi/i.test(navigator.userAgent || '');
+    const vivTabProp = Boolean(tab && typeof tab === 'object' && 'vivExtData' in tab);
+    return uaVivaldi || vivTabProp;
+  }
+
+  function detectPanelLayout() {
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      const isQueryPanel = params.get('panel') === '1';
+      const tallViewport = typeof window.innerHeight === 'number' && window.innerHeight > 620;
+      const nonPopupWidth = typeof window.innerWidth === 'number' && window.innerWidth > 0 && window.innerWidth !== 356;
+      document.documentElement.classList.toggle('is-panel', isQueryPanel || tallViewport || nonPopupWidth);
+    } catch (_) {
+      // Ignore layout detection failures
+    }
+  }
+
   async function queryActiveTab() {
     state.tabId = null;
+    state.windowId = null;
     state.tabUrl = '';
     state.hostname = '';
     state.supported = false;
     state.tabStatus = null;
 
     try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      let tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+      if (!tabs || tabs.length === 0) {
+        tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      }
       const tab = tabs && tabs[0];
-      if (!tab) return;
+      if (!tab) {
+        state.isVivaldi = detectIsVivaldi(null);
+        return;
+      }
 
       state.tabId = typeof tab.id === 'number' ? tab.id : null;
+      state.windowId = typeof tab.windowId === 'number' ? tab.windowId : null;
+      state.isVivaldi = detectIsVivaldi(tab);
       state.tabUrl = tab.url || '';
 
       const fallbackSupported = typeof SiteMatcher.isSupportedUrl === 'function'
@@ -273,6 +306,9 @@
       el.siteStatusPill.className = 'status-pill status-neutral';
       el.siteThemeDetail.textContent = '';
       el.siteThemeDetail.classList.add('hidden');
+      el.unsupportedHint.textContent = state.tabUrl.startsWith('vivaldi://')
+        ? "Vivaldi internal pages use Vivaldi's built-in Themes (vivaldi://settings/themes)."
+        : 'Browser internal pages cannot be modified by extensions.';
       el.siteToggle.checked = false;
       el.siteToggle.disabled = true;
       el.forceDarkRow.classList.add('hidden');
@@ -573,11 +609,64 @@
     }
   }
 
+  async function refreshActiveTabView() {
+    if (state.tabRefreshInFlight) {
+      state.pendingTabRefresh = true;
+      await state.tabRefreshInFlight;
+      if (state.pendingTabRefresh) {
+        state.pendingTabRefresh = false;
+        await refreshActiveTabView();
+      }
+      return;
+    }
+
+    state.tabRefreshInFlight = (async () => {
+      await queryActiveTab();
+      renderSiteCard();
+    })();
+
+    try {
+      await state.tabRefreshInFlight;
+    } finally {
+      state.tabRefreshInFlight = null;
+    }
+
+    if (state.pendingTabRefresh) {
+      state.pendingTabRefresh = false;
+      await refreshActiveTabView();
+    }
+  }
+
+  function scheduleTabRefresh() {
+    if (state.tabRefreshTimer) {
+      clearTimeout(state.tabRefreshTimer);
+    }
+    state.tabRefreshTimer = setTimeout(async function onTabRefreshTimeout() {
+      state.tabRefreshTimer = null;
+      await refreshActiveTabView();
+    }, 60);
+  }
+
   function bindEvents() {
     el.globalToggle.addEventListener('change', handleGlobalToggle);
     el.siteToggle.addEventListener('change', handleSiteToggle);
     el.btnForceDark.addEventListener('click', handleForceDarkToggle);
     el.btnResetAdjustments.addEventListener('click', handleResetAdjustments);
+
+    if (el.btnOpenSidepanel) {
+      el.btnOpenSidepanel.addEventListener('click', async function onSidepanelClick() {
+        if (chrome.sidePanel && typeof chrome.sidePanel.open === 'function' && state.windowId !== null) {
+          try {
+            // Must be called immediately before any await to preserve the user gesture
+            await chrome.sidePanel.open({ windowId: state.windowId });
+            return;
+          } catch (_) {
+            // Fall back to Vivaldi Setup guide if sidePanel cannot open in this browser mode
+          }
+        }
+        await openOptionsPage('vivaldi');
+      });
+    }
 
     el.btnOpenOptions.addEventListener('click', async function onGearClick() {
       await openOptionsPage();
@@ -648,9 +737,34 @@
         }
       });
     }
+
+    if (chrome.tabs && chrome.tabs.onActivated) {
+      chrome.tabs.onActivated.addListener(function onTabActivated() {
+        scheduleTabRefresh();
+      });
+    }
+
+    if (chrome.tabs && chrome.tabs.onUpdated) {
+      chrome.tabs.onUpdated.addListener(function onTabUpdated(tabId, changeInfo) {
+        if (tabId === state.tabId && changeInfo && (changeInfo.status === 'complete' || changeInfo.url)) {
+          scheduleTabRefresh();
+        }
+      });
+    }
+
+    if (chrome.windows && chrome.windows.onFocusChanged) {
+      chrome.windows.onFocusChanged.addListener(function onWindowFocusChanged(windowId) {
+        if (typeof windowId === 'number' && windowId >= 0) {
+          scheduleTabRefresh();
+        }
+      });
+    }
+
+    window.addEventListener('resize', detectPanelLayout);
   }
 
   document.addEventListener('DOMContentLoaded', async function onPopupReady() {
+    detectPanelLayout();
     cacheElements();
     bindEvents();
     await loadInitialState();

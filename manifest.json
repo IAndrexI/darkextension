@@ -2,14 +2,18 @@
   "manifest_version": 3,
   "name": "DarkExtension",
   "version": "1.0.0",
-  "description": "Universal dark mode for every website — curated themes for Amazon, eBay, and major sites, adaptive dynamic engine, native dark mode detection, and customizable presets.",
+  "description": "Universal dark mode for Vivaldi, Chrome, Edge, and Brave — curated themes for Amazon, eBay, and major sites, adaptive dynamic engine, Side/Web Panel mode, native dark mode detection, and customizable presets.",
   "permissions": [
     "storage",
     "tabs",
     "scripting",
     "contextMenus",
-    "alarms"
+    "alarms",
+    "sidePanel"
   ],
+  "side_panel": {
+    "default_path": "src/popup/popup.html"
+  },
   "host_permissions": [
     "http://*/*",
     "https://*/*"

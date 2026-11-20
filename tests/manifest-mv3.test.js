@@ -97,7 +97,7 @@ describe('Manifest V3 Compliance & Assets', () => {
 
   it('declares all required permissions, host_permissions, and keyboard commands', () => {
     const manifest = readManifest();
-    const requiredPerms = ['storage', 'tabs', 'scripting', 'contextMenus', 'alarms'];
+    const requiredPerms = ['storage', 'tabs', 'scripting', 'contextMenus', 'alarms', 'sidePanel'];
     assert.ok(Array.isArray(manifest.permissions));
     for (const perm of requiredPerms) {
       assert.ok(manifest.permissions.includes(perm), `Missing required permission: ${perm}`);
@@ -152,6 +152,15 @@ describe('Manifest V3 Compliance & Assets', () => {
     const optionsRel = manifest.options_page || manifest.options_ui?.page;
     assert.ok(typeof optionsRel === 'string' && optionsRel.length > 0, 'Missing options_page');
     assert.ok(fs.existsSync(path.join(ROOT, optionsRel)), `Missing options_page: ${optionsRel}`);
+
+    assert.ok(
+      manifest.side_panel && typeof manifest.side_panel.default_path === 'string' && manifest.side_panel.default_path.length > 0,
+      'Missing side_panel.default_path'
+    );
+    assert.ok(
+      fs.existsSync(path.join(ROOT, manifest.side_panel.default_path)),
+      `Missing side_panel.default_path: ${manifest.side_panel.default_path}`
+    );
 
     assert.ok(Array.isArray(manifest.content_scripts) && manifest.content_scripts.length >= 1);
     const primaryCs = manifest.content_scripts[0];

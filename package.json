@@ -6,10 +6,12 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "icons": "node scripts/generate-icons.mjs",
-    "package": "node scripts/package-zip.mjs"
+    "package": "node scripts/package-zip.mjs",
+    "setup:vivaldi": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-vivaldi.ps1"
   },
   "keywords": [
     "chrome-extension",
+    "vivaldi",
     "manifest-v3",
     "dark-mode",
     "universal-dark-mode",

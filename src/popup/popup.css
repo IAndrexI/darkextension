@@ -718,3 +718,47 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .dot-sep {
   opacity: 0.5;
 }
+
+/* Side Panel & Vivaldi Web Panel Responsive Mode */
+html.is-panel,
+html.is-panel body {
+  width: 100%;
+  min-width: 260px;
+  max-width: 100%;
+  min-height: 100vh;
+}
+
+html.is-panel .popup-shell {
+  min-height: 100vh;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+html.is-panel .schedule-summary {
+  max-width: none;
+}
+
+@media (max-width: 330px) {
+  .popup-shell {
+    padding: 9px;
+    gap: 8px;
+  }
+
+  .card {
+    padding: 9px;
+  }
+
+  .preset-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .popup-footer {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .schedule-summary {
+    max-width: 100px;
+  }
+}

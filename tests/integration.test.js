@@ -486,7 +486,7 @@ describe('Extension ZIP Packaging (scripts/package-zip.mjs)', () => {
       assert.ok(names.includes(req), `dist/darkextension.zip missing ${req}`);
     }
 
-    const forbiddenPrefixes = ['.git/', 'tests/', 'scripts/', 'node_modules/', 'dist/'];
+    const forbiddenPrefixes = ['.git/', 'tests/', 'scripts/', 'node_modules/', 'dist/', 'install-vivaldi.bat'];
     for (const name of names) {
       for (const bad of forbiddenPrefixes) {
         assert.equal(

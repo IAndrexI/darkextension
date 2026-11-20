@@ -99,6 +99,8 @@
     themes: [],
     customCssMap: {},
     activeSection: 'general',
+    isVivaldi: false,
+    currentWindowId: null,
     sliderTimer: null,
     pendingSliderPatch: {},
     toastTimer: null
@@ -205,6 +207,15 @@
     el.customCssList = document.getElementById('custom-css-list');
     el.customCssEmpty = document.getElementById('custom-css-empty');
 
+    // Vivaldi Setup
+    el.vivaldiBrowserBadge = document.getElementById('vivaldi-browser-badge');
+    el.vivaldiPanelUrl = document.getElementById('vivaldi-panel-url');
+    el.btnCopyPanelUrl = document.getElementById('btn-copy-panel-url');
+    el.btnVivaldiOpenSidepanel = document.getElementById('btn-vivaldi-open-sidepanel');
+    el.btnOpenVivaldiAppearance = document.getElementById('btn-open-vivaldi-appearance');
+    el.btnOpenVivaldiExtensions = document.getElementById('btn-open-vivaldi-extensions');
+    el.btnVivaldiOpenShortcuts = document.getElementById('btn-vivaldi-open-shortcuts');
+
     // Backup & Reset
     el.btnExportJson = document.getElementById('btn-export-json');
     el.importFileInput = document.getElementById('import-file-input');
@@ -297,7 +308,7 @@
   }
 
   function switchSection(sectionId) {
-    const validSections = ['general', 'themes', 'site-rules', 'schedule', 'custom-css', 'backup'];
+    const validSections = ['general', 'themes', 'site-rules', 'schedule', 'custom-css', 'vivaldi', 'backup'];
     const target = validSections.includes(sectionId) ? sectionId : 'general';
     state.activeSection = target;
 
@@ -378,6 +389,97 @@
     }
 
     await loadThemesRegistry();
+    await detectVivaldiEnvironment();
+  }
+
+  async function detectVivaldiEnvironment() {
+    let detected = typeof navigator !== 'undefined' && /Vivaldi/i.test(navigator.userAgent || '');
+
+    if (typeof chrome !== 'undefined' && chrome.windows && typeof chrome.windows.getCurrent === 'function') {
+      try {
+        const win = await chrome.windows.getCurrent();
+        if (win && typeof win.id === 'number') {
+          state.currentWindowId = win.id;
+        }
+      } catch (_) {
+        // Ignore window lookup errors
+      }
+    }
+
+    if (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.query === 'function') {
+      try {
+        const tabs = await chrome.tabs.query({ currentWindow: true });
+        if (Array.isArray(tabs)) {
+          for (const t of tabs) {
+            if (t && typeof t === 'object' && 'vivExtData' in t) {
+              detected = true;
+            }
+            if (state.currentWindowId === null && t && typeof t.windowId === 'number') {
+              state.currentWindowId = t.windowId;
+            }
+          }
+        }
+      } catch (_) {
+        // Ignore tab query errors
+      }
+    }
+
+    state.isVivaldi = detected;
+    renderVivaldiSection();
+  }
+
+  function renderVivaldiSection() {
+    if (el.vivaldiPanelUrl) {
+      const panelUrl = chrome.runtime && typeof chrome.runtime.getURL === 'function'
+        ? chrome.runtime.getURL('src/popup/popup.html?panel=1')
+        : '../popup/popup.html?panel=1';
+      el.vivaldiPanelUrl.value = panelUrl;
+    }
+    if (el.vivaldiBrowserBadge) {
+      if (state.isVivaldi) {
+        el.vivaldiBrowserBadge.textContent = 'Vivaldi Detected';
+        el.vivaldiBrowserBadge.classList.add('is-vivaldi');
+      } else {
+        el.vivaldiBrowserBadge.textContent = 'Chromium Browser';
+        el.vivaldiBrowserBadge.classList.remove('is-vivaldi');
+      }
+    }
+  }
+
+  async function copyTextToClipboard(text) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (_) {
+        // Fall through to input copy fallback
+      }
+    }
+    return false;
+  }
+
+  async function openBrowserInternalPage(targetUrl, fallbackPromptText) {
+    if (targetUrl.startsWith('vivaldi://') && !state.isVivaldi) {
+      const copied = await copyTextToClipboard(targetUrl);
+      showToast(
+        copied
+          ? `Copied ${targetUrl} — open it in Vivaldi's address bar.`
+          : (fallbackPromptText || `Open ${targetUrl} in Vivaldi's address bar.`),
+        'warn'
+      );
+      return;
+    }
+    try {
+      await chrome.tabs.create({ url: targetUrl });
+    } catch (_) {
+      const copied = await copyTextToClipboard(targetUrl);
+      showToast(
+        copied
+          ? `Copied ${targetUrl} — paste it into your address bar.`
+          : (fallbackPromptText || `Open ${targetUrl} in your address bar.`),
+        'warn'
+      );
+    }
   }
 
   function renderBadges() {
@@ -880,6 +982,7 @@
     renderSiteRulesSection();
     renderScheduleSection();
     renderCustomCssSection();
+    renderVivaldiSection();
   }
 
   async function updateSettingsPatch(patch) {
@@ -1237,12 +1340,73 @@
     });
 
     el.btnOpenShortcuts.addEventListener('click', async function onOpenShortcutsClick() {
-      try {
-        await chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
-      } catch (err) {
-        showToast('Open chrome://extensions/shortcuts in your address bar to customize keys.', 'warn');
-      }
+      await openBrowserInternalPage(
+        'chrome://extensions/shortcuts',
+        'Open chrome://extensions/shortcuts in your address bar to customize keys.'
+      );
     });
+
+    // Vivaldi Setup
+    if (el.btnCopyPanelUrl) {
+      el.btnCopyPanelUrl.addEventListener('click', async function onCopyPanelUrlClick() {
+        const panelUrl = el.vivaldiPanelUrl ? el.vivaldiPanelUrl.value : '';
+        if (!panelUrl) return;
+        let copied = await copyTextToClipboard(panelUrl);
+        if (!copied && el.vivaldiPanelUrl) {
+          el.vivaldiPanelUrl.focus();
+          el.vivaldiPanelUrl.select();
+          try {
+            copied = document.execCommand('copy');
+          } catch (_) {
+            copied = false;
+          }
+        }
+        if (copied) {
+          showToast('Copied Vivaldi Web Panel URL — click + on Vivaldi Panel bar and paste.', 'success');
+        } else {
+          showToast('Select and copy the Web Panel URL above.', 'warn');
+        }
+      });
+    }
+
+    if (el.btnVivaldiOpenSidepanel) {
+      el.btnVivaldiOpenSidepanel.addEventListener('click', async function onVivaldiSidepanelClick() {
+        if (chrome.sidePanel && typeof chrome.sidePanel.open === 'function' && state.currentWindowId !== null) {
+          try {
+            await chrome.sidePanel.open({ windowId: state.currentWindowId });
+            return;
+          } catch (_) {
+            // Fall through to helpful toast
+          }
+        }
+        showToast('Use the Web Panel URL above (+) or the extension toolbar Side Panel icon in Vivaldi.', 'warn');
+      });
+    }
+
+    if (el.btnOpenVivaldiAppearance) {
+      el.btnOpenVivaldiAppearance.addEventListener('click', async function onOpenVivaldiAppearanceClick() {
+        await openBrowserInternalPage(
+          'vivaldi://settings/appearance/',
+          'Open vivaldi://settings/appearance/ in Vivaldi to configure Website Appearance.'
+        );
+      });
+    }
+
+    if (el.btnOpenVivaldiExtensions) {
+      el.btnOpenVivaldiExtensions.addEventListener('click', async function onOpenVivaldiExtensionsClick() {
+        const target = state.isVivaldi ? 'vivaldi://extensions' : 'chrome://extensions';
+        await openBrowserInternalPage(target, `Open ${target} in your browser address bar.`);
+      });
+    }
+
+    if (el.btnVivaldiOpenShortcuts) {
+      el.btnVivaldiOpenShortcuts.addEventListener('click', async function onVivaldiShortcutsClick() {
+        await openBrowserInternalPage(
+          'chrome://extensions/shortcuts',
+          'Open chrome://extensions/shortcuts in your address bar to customize keys.'
+        );
+      });
+    }
 
     // Custom CSS
     el.btnInsertCssSnippet.addEventListener('click', function onInsertSnippetClick() {

@@ -197,6 +197,7 @@
     TOGGLE_SITE: 'darkext-toggle-site',
     TOGGLE_GLOBAL: 'darkext-toggle-global',
     FORCE_DARK: 'darkext-force-dark',
+    OPEN_SIDE_PANEL: 'darkext-open-side-panel',
     OPEN_OPTIONS: 'darkext-open-options'
   });
 

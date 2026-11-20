@@ -19,6 +19,18 @@ A zero-build-step Chrome Manifest V3 universal dark mode extension featuring cur
 - **Per-Site Rules & Custom CSS**: Override modes (`Auto`, `Dynamic`, `Filter`, `Off`), toggle specific curated themes, write custom CSS per domain, and import/export JSON backups.
 - **Zero Build Step & Strict MV3**: Pure vanilla ES modules/scripts, `async`/`await`, `chrome.alarms`, `chrome.scripting`, `chrome.storage.sync`/`local`, and zero external npm dependencies.
 
+## Quick Install for Vivaldi (Recommended)
+
+DarkExtension has built-in support for **Vivaldi** (Side Panel / Web Panel docking, live Tab Stack & Tiled Tab tracking, and a dedicated **Vivaldi Setup** tab in Options):
+
+1. **One-Click Setup (Windows)**: Double-click [`install-vivaldi.bat`](install-vivaldi.bat) (or run `npm run setup:vivaldi`). It copies the folder path to your clipboard, selects the folder in Explorer, and opens `vivaldi://extensions`.
+2. **Load into Vivaldi**: Toggle **Developer mode** ON, then drag and drop the `darkextension` folder right onto `vivaldi://extensions` (or click **Load unpacked** -> `Ctrl+V` -> Enter).
+3. **Pin the Toolbar Button**: Click the puzzle / Extensions icon on Vivaldi's Address Bar -> right-click **DarkExtension** -> uncheck **Hide Button** (or select **Show Button**).
+4. **Dock in Vivaldi's Side / Web Panel (Optional)**:
+   - Click the **Dock in Side Panel** icon in the popup header (or right-click any page -> **Open DarkExtension Side Panel**), **or**
+   - Open DarkExtension **Options -> Vivaldi Setup**, click **Copy Web Panel URL**, click `+` on Vivaldi's left Panel bar (`F4`), and paste the URL. The docked panel adapts to narrow widths and live-updates as you switch tabs!
+5. **Prevent Double-Darkening**: In `vivaldi://settings/appearance/`, set **Website Appearance** to **Dark** and keep **"Force a Dark Theme on All Websites"** turned **OFF** so Vivaldi doesn't invert pages on top of DarkExtension's curated themes.
+
 ## Installation (Chrome / Edge / Brave)
 
 1. Clone or download this repository:
