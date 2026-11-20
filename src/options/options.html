@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" data-preset="midnight">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DarkExtension — Options &amp; Control Dashboard</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" aria-label="Dashboard Navigation">
+      <div class="sidebar-brand">
+        <span class="brand-emblem" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="url(#de-opt-grad)" opacity="0.22"></circle>
+            <path d="M19.5 14.2A7.5 7.5 0 0 1 9.8 4.5a7.5 7.5 0 1 0 9.7 9.7Z" fill="url(#de-opt-grad)"></path>
+            <circle cx="17.2" cy="6.8" r="1.3" fill="currentColor"></circle>
+            <defs>
+              <linearGradient id="de-opt-grad" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#8da8ff"></stop>
+                <stop offset="100%" stop-color="#5b7bff"></stop>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <div>
+          <div class="brand-name">DarkExtension</div>
+          <div class="brand-version">Universal Dark Mode · v1.0.0</div>
+        </div>
+      </div>
+
+      <nav id="sidebar-nav" class="sidebar-nav" aria-label="Sections">
+        <button type="button" class="nav-item is-active" data-section="general">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+            </svg>
+          </span>
+          <span class="nav-label">General &amp; Appearance</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="themes">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+          </span>
+          <span class="nav-label">Supported Site Themes</span>
+          <span id="badge-themes-count" class="nav-badge">0</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="site-rules">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </span>
+          <span class="nav-label">Site Rules</span>
+          <span id="badge-rules-count" class="nav-badge">0</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="schedule">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </span>
+          <span class="nav-label">Schedule &amp; Automation</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="custom-css">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </span>
+          <span class="nav-label">Custom CSS</span>
+          <span id="badge-css-count" class="nav-badge">0</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="backup">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </span>
+          <span class="nav-label">Backup &amp; Reset</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-power-row">
+          <div>
+            <div class="power-title">Global Status</div>
+            <div id="sidebar-power-status" class="power-sub">Active</div>
+          </div>
+          <label class="switch" title="Enable or pause DarkExtension globally">
+            <input id="sidebar-global-toggle" type="checkbox" aria-label="Enable DarkExtension globally">
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div id="toast-banner" class="toast-banner hidden" role="status" aria-live="polite">
+        <span id="toast-message"></span>
+        <div id="toast-actions" class="toast-actions"></div>
+      </div>
+
+      <!-- SECTION 1: General & Appearance -->
+      <section id="section-general" class="panel is-active" aria-labelledby="heading-general">
+        <header class="panel-header">
+          <div>
+            <h1 id="heading-general" class="panel-title">General &amp; Appearance</h1>
+            <p class="panel-subtitle">Choose a palette preset, default darkening strategy, and live filter adjustments.</p>
+          </div>
+        </header>
+
+        <!-- Master Toggles -->
+        <div class="card">
+          <h2 class="card-title">Engine Behavior</h2>
+          <div class="toggle-list">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-name">Enable DarkExtension</div>
+                <div class="toggle-desc">Master switch controlling all dark themes and engines across sites.</div>
+              </div>
+              <label class="switch">
+                <input id="opt-enabled" type="checkbox" aria-label="Enable DarkExtension">
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-name">Auto-detect Native Dark Mode</div>
+                <div class="toggle-desc">Automatically skip sites that already provide a dark interface (can be overridden per site).</div>
+              </div>
+              <label class="switch">
+                <input id="opt-auto-detect" type="checkbox" aria-label="Auto-detect native dark mode">
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-name">Dim Bright Images &amp; Media</div>
+                <div class="toggle-desc">Soften harsh white backgrounds in photos, thumbnails, and videos.</div>
+              </div>
+              <label class="switch">
+                <input id="opt-dim-images" type="checkbox" aria-label="Dim bright images and media">
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Default Engine Mode -->
+        <div class="card">
+          <h2 class="card-title">Default Engine Mode</h2>
+          <div id="default-mode-grid" class="mode-cards-grid" role="radiogroup" aria-label="Default Engine Mode">
+            <button type="button" class="mode-card" data-mode="auto" role="radio" aria-checked="true">
+              <div class="mode-card-title">Auto <span class="recommended-pill">Recommended</span></div>
+              <div class="mode-card-desc">Uses curated site themes when available, otherwise runs the Universal Dynamic engine.</div>
+            </button>
+            <button type="button" class="mode-card" data-mode="dynamic" role="radio" aria-checked="false">
+              <div class="mode-card-title">Universal Dynamic</div>
+              <div class="mode-card-desc">Smart DOM color analysis converting light surfaces while preserving photos and icons.</div>
+            </button>
+            <button type="button" class="mode-card" data-mode="filter" role="radio" aria-checked="false">
+              <div class="mode-card-title">Filter Mode</div>
+              <div class="mode-card-desc">Fast CSS inversion filter with hue correction for complex canvas or legacy pages.</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Theme Presets -->
+        <div class="card">
+          <h2 class="card-title">Color Palette Preset</h2>
+          <div id="preset-cards-grid" class="preset-cards-grid" role="radiogroup" aria-label="Theme Palette Presets">
+            <button type="button" class="preset-card" data-preset="midnight" role="radio" aria-checked="true">
+              <div class="preset-mini preset-mini-midnight">
+                <div class="mini-header"><span></span><span></span></div>
+                <div class="mini-body">
+                  <div class="mini-card-box"></div>
+                  <div class="mini-accent"></div>
+                </div>
+              </div>
+              <div class="preset-info">
+                <div class="preset-name">Midnight</div>
+                <div class="preset-desc">Deep neutral charcoal · #121418</div>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="oled" role="radio" aria-checked="false">
+              <div class="preset-mini preset-mini-oled">
+                <div class="mini-header"><span></span><span></span></div>
+                <div class="mini-body">
+                  <div class="mini-card-box"></div>
+                  <div class="mini-accent"></div>
+                </div>
+              </div>
+              <div class="preset-info">
+                <div class="preset-name">OLED</div>
+                <div class="preset-desc">True pitch black · #000000</div>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="warm" role="radio" aria-checked="false">
+              <div class="preset-mini preset-mini-warm">
+                <div class="mini-header"><span></span><span></span></div>
+                <div class="mini-body">
+                  <div class="mini-card-box"></div>
+                  <div class="mini-accent"></div>
+                </div>
+              </div>
+              <div class="preset-info">
+                <div class="preset-name">Warm</div>
+                <div class="preset-desc">Eye-friendly espresso · #181512</div>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="slate" role="radio" aria-checked="false">
+              <div class="preset-mini preset-mini-slate">
+                <div class="mini-header"><span></span><span></span></div>
+                <div class="mini-body">
+                  <div class="mini-card-box"></div>
+                  <div class="mini-accent"></div>
+                </div>
+              </div>
+              <div class="preset-info">
+                <div class="preset-name">Slate</div>
+                <div class="preset-desc">Crisp cool indigo · #0f172a</div>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="nord" role="radio" aria-checked="false">
+              <div class="preset-mini preset-mini-nord">
+                <div class="mini-header"><span></span><span></span></div>
+                <div class="mini-body">
+                  <div class="mini-card-box"></div>
+                  <div class="mini-accent"></div>
+                </div>
+              </div>
+              <div class="preset-info">
+                <div class="preset-name">Nord</div>
+                <div class="preset-desc">Arctic frosted slate · #242933</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sliders + Live Preview Split -->
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-head-row">
+              <h2 class="card-title">Global Adjustments</h2>
+              <button id="opt-btn-reset-sliders" type="button" class="btn btn-ghost btn-sm">Reset Defaults</button>
+            </div>
+
+            <div class="sliders-stack">
+              <div class="slider-group">
+                <div class="slider-head">
+                  <label for="opt-brightness">Brightness</label>
+                  <span id="opt-val-brightness" class="slider-readout">100%</span>
+                </div>
+                <input id="opt-brightness" type="range" min="50" max="130" step="1" value="100">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-head">
+                  <label for="opt-contrast">Contrast</label>
+                  <span id="opt-val-contrast" class="slider-readout">100%</span>
+                </div>
+                <input id="opt-contrast" type="range" min="70" max="140" step="1" value="100">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-head">
+                  <label for="opt-sepia">Warmth / Sepia</label>
+                  <span id="opt-val-sepia" class="slider-readout">0%</span>
+                </div>
+                <input id="opt-sepia" type="range" min="0" max="60" step="1" value="0">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-head">
+                  <label for="opt-image-brightness">Image Brightness</label>
+                  <span id="opt-val-image-brightness" class="slider-readout">90%</span>
+                </div>
+                <input id="opt-image-brightness" type="range" min="50" max="100" step="1" value="90">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-head">
+                  <label for="opt-grayscale">Grayscale</label>
+                  <span id="opt-val-grayscale" class="slider-readout">0%</span>
+                </div>
+                <input id="opt-grayscale" type="range" min="0" max="100" step="1" value="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head-row">
+              <h2 class="card-title">Live Preview</h2>
+              <span id="preview-preset-tag" class="tag">Midnight</span>
+            </div>
+            <div id="live-preview-stage" class="preview-stage">
+              <div class="preview-browser-bar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="preview-url">https://example.com/article</span>
+              </div>
+              <div id="live-preview-canvas" class="preview-canvas">
+                <div class="preview-article">
+                  <h3 class="preview-h3">Sample Page Heading</h3>
+                  <p class="preview-p">Primary body copy adapts cleanly to maintain crisp reading contrast without harsh glare.</p>
+                  <p class="preview-p-sub">Secondary metadata · Updated just now · <span class="preview-link">Read full guide</span></p>
+                  <div class="preview-controls">
+                    <span class="preview-input">Search items...</span>
+                    <span class="preview-cta">Add to Cart</span>
+                  </div>
+                </div>
+                <div id="live-preview-media" class="preview-media" aria-hidden="true">
+                  <svg viewBox="0 0 120 76" width="120" height="76">
+                    <defs>
+                      <linearGradient id="pv-sky" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#60a5fa"></stop>
+                        <stop offset="100%" stop-color="#a78bfa"></stop>
+                      </linearGradient>
+                    </defs>
+                    <rect width="120" height="76" rx="6" fill="url(#pv-sky)"></rect>
+                    <circle cx="92" cy="22" r="10" fill="#fde68a"></circle>
+                    <path d="M0 62 L35 34 L68 54 L92 40 L120 62 L120 76 L0 76 Z" fill="#1e293b" opacity="0.78"></path>
+                  </svg>
+                  <span class="preview-media-caption">Sample Media</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: Supported Site Themes -->
+      <section id="section-themes" class="panel" aria-labelledby="heading-themes">
+        <header class="panel-header">
+          <div>
+            <h1 id="heading-themes" class="panel-title">Supported Site Themes</h1>
+            <p class="panel-subtitle">Curated high-contrast stylesheets crafted for major sites without native dark mode.</p>
+          </div>
+          <div class="header-stat" id="themes-summary-stat">Loading themes...</div>
+        </header>
+
+        <div class="card toolbar-card">
+          <div class="toolbar-row">
+            <input id="theme-search" type="search" class="input-field" placeholder="Search by site name, domain, or description...">
+            <select id="theme-category-filter" class="select-field" aria-label="Filter by category">
+              <option value="all">All Categories</option>
+            </select>
+            <button id="btn-enable-all-themes" type="button" class="btn btn-secondary btn-sm">Enable All</button>
+            <button id="btn-disable-all-themes" type="button" class="btn btn-ghost btn-sm">Disable All</button>
+          </div>
+        </div>
+
+        <div id="themes-grid" class="themes-grid"></div>
+        <div id="themes-empty" class="empty-state hidden">No curated themes match your current filter.</div>
+      </section>
+
+      <!-- SECTION 3: Site Rules -->
+      <section id="section-site-rules" class="panel" aria-labelledby="heading-rules">
+        <header class="panel-header">
+          <div>
+            <h1 id="heading-rules" class="panel-title">Site Rules</h1>
+            <p class="panel-subtitle">Override engine mode, enable/exclude status, or force dark mode per hostname.</p>
+          </div>
+        </header>
+
+        <div class="card">
+          <h2 class="card-title">Add or Update Site Rule</h2>
+          <form id="add-rule-form" class="rule-form" novalidate>
+            <div class="form-field form-field-grow">
+              <label for="rule-domain-input">Domain or Hostname</label>
+              <input id="rule-domain-input" type="text" class="input-field" placeholder="e.g. amazon.com or news.ycombinator.com" required>
+            </div>
+            <div class="form-field">
+              <label for="rule-mode-select">Engine Mode</label>
+              <select id="rule-mode-select" class="select-field">
+                <option value="auto">Auto</option>
+                <option value="dynamic">Dynamic</option>
+                <option value="filter">Filter</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="rule-status-select">Status</label>
+              <select id="rule-status-select" class="select-field">
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Excluded (Off)</option>
+              </select>
+            </div>
+            <div class="form-check">
+              <label class="checkbox-label">
+                <input id="rule-force-native" type="checkbox">
+                <span>Force over native dark</span>
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Rule</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-head-row">
+            <h2 class="card-title">Configured Rules</h2>
+            <input id="rules-search" type="search" class="input-field input-sm" placeholder="Filter rules...">
+          </div>
+
+          <div class="table-wrap">
+            <table class="rules-table">
+              <thead>
+                <tr>
+                  <th>Domain</th>
+                  <th>Engine Mode</th>
+                  <th>Force Native</th>
+                  <th>Enabled</th>
+                  <th class="col-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rules-tbody"></tbody>
+            </table>
+          </div>
+          <div id="rules-empty" class="empty-state">No per-site rules configured yet. Use the form above or the popup control card to add one.</div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: Schedule & Automation -->
+      <section id="section-schedule" class="panel" aria-labelledby="heading-schedule">
+        <header class="panel-header">
+          <div>
+            <h1 id="heading-schedule" class="panel-title">Schedule &amp; Automation</h1>
+            <p class="panel-subtitle">Automate DarkExtension based on your operating system appearance or custom daily hours.</p>
+          </div>
+        </header>
+
+        <div class="card">
+          <div class="card-head-row">
+            <h2 class="card-title">Activation Schedule</h2>
+            <span id="schedule-live-pill" class="tag">Always Manual</span>
+          </div>
+
+          <div id="schedule-modes" class="schedule-options">
+            <label class="radio-card">
+              <input type="radio" name="schedule-mode" value="off" checked>
+              <div class="radio-card-body">
+                <div class="radio-title">Always Manual (Off)</div>
+                <div class="radio-desc">Only toggles when you use the toolbar switch or keyboard shortcut.</div>
+              </div>
+            </label>
+
+            <label class="radio-card">
+              <input type="radio" name="schedule-mode" value="system">
+              <div class="radio-card-body">
+                <div class="radio-title">Follow System Theme</div>
+                <div class="radio-desc">Automatically activates when your OS is in dark mode and turns off in light mode.</div>
+              </div>
+            </label>
+
+            <label class="radio-card">
+              <input type="radio" name="schedule-mode" value="time">
+              <div class="radio-card-body">
+                <div class="radio-title">Time Schedule</div>
+                <div class="radio-desc">Activates during your preferred evening hours (overnight wrap-around supported).</div>
+              </div>
+            </label>
+          </div>
+
+          <div id="time-schedule-inputs" class="time-inputs-row is-disabled">
+            <div class="form-field">
+              <label for="schedule-start">Turn On At</label>
+              <input id="schedule-start" type="time" class="input-field" value="20:00">
+            </div>
+            <div class="form-field">
+              <label for="schedule-end">Turn Off At</label>
+              <input id="schedule-end" type="time" class="input-field" value="07:00">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head-row">
+            <h2 class="card-title">Keyboard Shortcuts</h2>
+            <button id="btn-open-shortcuts" type="button" class="btn btn-secondary btn-sm">Customize in Chrome</button>
+          </div>
+          <div class="shortcuts-list">
+            <div class="shortcut-item">
+              <div>
+                <div class="shortcut-name">Toggle Current Site</div>
+                <div class="shortcut-desc">Quickly enable or exclude the active tab hostname.</div>
+              </div>
+              <kbd class="kbd">Alt+Shift+D</kbd>
+            </div>
+            <div class="shortcut-item">
+              <div>
+                <div class="shortcut-name">Toggle DarkExtension Globally</div>
+                <div class="shortcut-desc">Pause or resume DarkExtension across all browser tabs.</div>
+              </div>
+              <kbd class="kbd">Alt+Shift+G</kbd>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: Custom CSS -->
+      <section id="section-custom-css" class="panel" aria-labelledby="heading-custom-css">
+        <header class="panel-header">
+          <div>
+            <h1 id="heading-custom-css" class="panel-title">Custom CSS</h1>
+            <p class="panel-subtitle">Inject custom CSS overrides per hostname for fine-grained styling control.</p>
+          </div>
+        </header>
+
+        <div class="two-col-grid css-layout">
+          <div class="card">
+            <h2 class="card-title">Site CSS Editor</h2>
+            <div class="form-field">
+              <label for="custom-css-host">Target Hostname</label>
+              <input id="custom-css-host" type="text" class="input-field" placeholder="e.g. amazon.com">
+            </div>
+            <div class="form-field">
+              <div class="card-head-row">
+                <label for="custom-css-editor">CSS Rules</label>
+                <button id="btn-insert-css-snippet" type="button" class="btn btn-ghost btn-sm">Insert Template</button>
+              </div>
+              <textarea id="custom-css-editor" class="code-editor" rows="13" spellcheck="false" placeholder="/* Example override for this site */&#10;html[data-darkext-active=&quot;true&quot;] body {&#10;  background-color: var(--de-bg) !important;&#10;}"></textarea>
+            </div>
+            <div class="button-row">
+              <button id="btn-save-custom-css" type="button" class="btn btn-primary">Save Custom CSS</button>
+              <button id="btn-clear-custom-css" type="button" class="btn btn-ghost">Clear / Delete</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head-row">
+              <h2 class="card-title">Saved Domains</h2>
+              <button id="btn-refresh-custom-css" type="button" class="btn btn-ghost btn-sm">Refresh</button>
+            </div>
+            <div id="custom-css-list" class="saved-css-list"></div>
+            <div id="custom-css-empty" class="empty-state">No custom CSS rules saved yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 6: Backup & Reset -->
+      <section id="section-backup" class="panel" aria-labelledby="heading-backup">
+        <header class="panel-header">
+          <div>
+            <h1 id="heading-backup" class="panel-title">Backup &amp; Reset</h1>
+            <p class="panel-subtitle">Export your configuration to JSON, restore from a backup file, or reset to factory defaults.</p>
+          </div>
+        </header>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <h2 class="card-title">Export Settings</h2>
+            <p class="card-desc">Download a JSON backup containing your global settings, theme preferences, schedule, site rules, and saved custom CSS.</p>
+            <div>
+              <button id="btn-export-json" type="button" class="btn btn-primary">Export Backup JSON</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Import Settings</h2>
+            <p class="card-desc">Restore settings from a previously exported DarkExtension JSON backup file.</p>
+            <div class="import-controls">
+              <input id="import-file-input" type="file" accept=".json,application/json" class="sr-only">
+              <button id="btn-import-trigger" type="button" class="btn btn-secondary">Choose JSON Backup...</button>
+              <span id="import-file-status" class="import-status">No file chosen</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card danger-card">
+          <h2 class="card-title danger-title">Factory Reset</h2>
+          <p class="card-desc">Reset all global settings, adjustments, disabled theme selections, site rules, and custom CSS back to defaults.</p>
+          <div class="reset-actions">
+            <button id="btn-reset-all-trigger" type="button" class="btn btn-danger">Reset All Settings</button>
+          </div>
+          <div id="reset-confirm-bar" class="inline-confirm hidden" role="alertdialog" aria-label="Confirm factory reset">
+            <span class="confirm-text">Are you sure? All rules, adjustments, and custom CSS will be reset to defaults.</span>
+            <div class="confirm-buttons">
+              <button id="btn-reset-confirm" type="button" class="btn btn-danger btn-sm">Confirm Reset</button>
+              <button id="btn-reset-cancel" type="button" class="btn btn-ghost btn-sm">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/site-matcher.js"></script>
+  <script src="../shared/schedule.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

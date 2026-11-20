@@ -1,0 +1,81 @@
+/* DarkExtension Site Theme: Indeed */
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] body,
+html[data-darkext-active="true"][data-darkext-site="indeed"] main,
+html[data-darkext-active="true"][data-darkext-site="indeed"] #jobsearch-Main,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .jobsearch-SerpMainContent,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .jobsearch-ViewJobLayout {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] header,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .gnav,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .job_seen_beacon,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .jobsearch-RightPane,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .jobsearch-JobComponent,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .icl-Card,
+html[data-darkext-active="true"][data-darkext-site="indeed"] [role="dialog"],
+html[data-darkext-active="true"][data-darkext-site="indeed"] footer {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] .jobsearch-JobInfoHeader-title,
+html[data-darkext-active="true"][data-darkext-site="indeed"] #jobDescriptionText,
+html[data-darkext-active="true"][data-darkext-site="indeed"] h1,
+html[data-darkext-active="true"][data-darkext-site="indeed"] h2,
+html[data-darkext-active="true"][data-darkext-site="indeed"] h3,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .jobTitle {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] .companyName,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .companyLocation,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .job-snippet {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] .salary-snippet-container,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .yosegi-FilterPill-pill {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] input,
+html[data-darkext-active="true"][data-darkext-site="indeed"] select,
+html[data-darkext-active="true"][data-darkext-site="indeed"] textarea,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .icl-TextInput-control {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] #indeedApplyButton,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .jobsearch-IndeedApplyButton-newDesign button,
+html[data-darkext-active="true"][data-darkext-site="indeed"] .yosegi-InlineWhatWhere-primaryButton {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"] img,
+html[data-darkext-active="true"][data-darkext-site="indeed"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="indeed"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

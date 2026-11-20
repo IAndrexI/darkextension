@@ -1,0 +1,89 @@
+/* DarkExtension Site Theme: Walmart */
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] body,
+html[data-darkext-active="true"][data-darkext-site="walmart"] #__next,
+html[data-darkext-active="true"][data-darkext-site="walmart"] main,
+html[data-darkext-active="true"][data-darkext-site="walmart"] .bg-white,
+html[data-darkext-active="true"][data-darkext-site="walmart"] .bg-near-white {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] header,
+html[data-darkext-active="true"][data-darkext-site="walmart"] [data-testid="header-wrapper"],
+html[data-darkext-active="true"][data-darkext-site="walmart"] nav,
+html[data-darkext-active="true"][data-darkext-site="walmart"] footer {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] [data-testid="item-stack"],
+html[data-darkext-active="true"][data-darkext-site="walmart"] [data-testid="list-view"],
+html[data-darkext-active="true"][data-darkext-site="walmart"] [data-item-id],
+html[data-darkext-active="true"][data-darkext-site="walmart"] [data-testid="buy-box-container"],
+html[data-darkext-active="true"][data-darkext-site="walmart"] [data-testid="product-reviews"],
+html[data-darkext-active="true"][data-darkext-site="walmart"] .b--near-white,
+html[data-darkext-active="true"][data-darkext-site="walmart"] .ba,
+html[data-darkext-active="true"][data-darkext-site="walmart"] [role="dialog"],
+html[data-darkext-active="true"][data-darkext-site="walmart"] [role="menu"] {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] h1,
+html[data-darkext-active="true"][data-darkext-site="walmart"] h2,
+html[data-darkext-active="true"][data-darkext-site="walmart"] h3,
+html[data-darkext-active="true"][data-darkext-site="walmart"] .dark-gray,
+html[data-darkext-active="true"][data-darkext-site="walmart"] .black,
+html[data-darkext-active="true"][data-darkext-site="walmart"] [itemprop="price"] {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] .mid-gray,
+html[data-darkext-active="true"][data-darkext-site="walmart"] .gray {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] input,
+html[data-darkext-active="true"][data-darkext-site="walmart"] select,
+html[data-darkext-active="true"][data-darkext-site="walmart"] textarea {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] button[data-automation-id="add-to-cart"],
+html[data-darkext-active="true"][data-darkext-site="walmart"] [data-testid="add-to-cart-button"] {
+  background-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+  border-color: var(--de-accent) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] table,
+html[data-darkext-active="true"][data-darkext-site="walmart"] th,
+html[data-darkext-active="true"][data-darkext-site="walmart"] td {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"] img,
+html[data-darkext-active="true"][data-darkext-site="walmart"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="walmart"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

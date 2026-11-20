@@ -1,0 +1,145 @@
+/* DarkExtension Site Theme: Wikipedia & Wikimedia */
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] body,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-page-container,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-page-container-inner,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-content-container,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] #content,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-body,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] #mw-content-text,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-parser-output,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] #mw-page-base {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+  border-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] header,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .vector-header-container,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] #mw-head,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] #mw-panel,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .vector-main-menu,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .vector-pinned-container,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .vector-toc,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .vector-dropdown-content,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .cdx-menu,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] #footer,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-footer-container {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] h1,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] h2,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] h3,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] h4,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-headline,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .firstHeading {
+  color: var(--de-text) !important;
+  border-bottom-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] p,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] li,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] dd,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] dt {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] a:visited {
+  color: var(--de-link-visited) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] a.new {
+  color: var(--de-danger) !important;
+}
+
+/* Infoboxes, navboxes, tables, TOC, thumbs, citations */
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .infobox,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .sidebar,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .wikitable,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .navbox,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .navbox-inner,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .toc,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] #toc,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .thumbinner,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] figure,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .catlinks,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .ambox,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .hatnote,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .quotebox,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] blockquote {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .infobox th,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .wikitable th,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .navbox-title,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .navbox-group,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .infobox-above,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .infobox-header {
+  background-color: var(--de-bg-subtle) !important;
+  color: var(--de-text) !important;
+  border-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .infobox td,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .wikitable td,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .navbox-list,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] figcaption,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .thumbcaption {
+  background-color: var(--de-bg-elevated) !important;
+  color: var(--de-text-secondary) !important;
+  border-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] pre,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] code,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mw-highlight {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] input,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] select,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] textarea,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .cdx-text-input__input {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .cdx-button {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+/* Keep photos natural; ensure black-ink math SVG formulas stay crisp */
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] img,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mwe-math-fallback-image-inline,
+html[data-darkext-active="true"][data-darkext-site="wikipedia"] .mwe-math-fallback-image-display {
+  filter: invert(0.9) hue-rotate(180deg) !important;
+}

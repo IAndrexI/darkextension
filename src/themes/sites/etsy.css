@@ -1,0 +1,81 @@
+/* DarkExtension Site Theme: Etsy */
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] body,
+html[data-darkext-active="true"][data-darkext-site="etsy"] #content,
+html[data-darkext-active="true"][data-darkext-site="etsy"] main,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-bg-white,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-bg-gray {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] #gnav-header,
+html[data-darkext-active="true"][data-darkext-site="etsy"] header,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-menu__body,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-overlay__modal,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-card,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .v2-listing-card,
+html[data-darkext-active="true"][data-darkext-site="etsy"] #listing-right-column,
+html[data-darkext-active="true"][data-darkext-site="etsy"] #reviews,
+html[data-darkext-active="true"][data-darkext-site="etsy"] footer {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-text-black,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-text-heading,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-text-title,
+html[data-darkext-active="true"][data-darkext-site="etsy"] h1,
+html[data-darkext-active="true"][data-darkext-site="etsy"] h2,
+html[data-darkext-active="true"][data-darkext-site="etsy"] h3 {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-text-gray,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-text-caption {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] input,
+html[data-darkext-active="true"][data-darkext-site="etsy"] select,
+html[data-darkext-active="true"][data-darkext-site="etsy"] textarea,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-input,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-select__element {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-btn--filled,
+html[data-darkext-active="true"][data-darkext-site="etsy"] [data-add-to-cart-button] button {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-btn--secondary,
+html[data-darkext-active="true"][data-darkext-site="etsy"] .wt-btn--outline {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"] img,
+html[data-darkext-active="true"][data-darkext-site="etsy"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="etsy"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

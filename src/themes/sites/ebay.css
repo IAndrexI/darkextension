@@ -1,0 +1,345 @@
+/* DarkExtension Site Theme: eBay (global marketplaces) */
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] body,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #mainContent,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .page-grid,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .srp-main,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .srp-river,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .srp-river-main,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .vi-swc-lsp,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .vim,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .hl-page-container,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .vl-page-container {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+/* Global typography and links */
+html[data-darkext-active="true"][data-darkext-site="ebay"] h1,
+html[data-darkext-active="true"][data-darkext-site="ebay"] h2,
+html[data-darkext-active="true"][data-darkext-site="ebay"] h3,
+html[data-darkext-active="true"][data-darkext-site="ebay"] h4,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-item-title,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-item-title__mainTitle,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-price-primary,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .ux-textspans {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .SECONDARY_INFO,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__subtitle,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__shipping,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__location,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__seller-info,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .ux-labels-values__labels {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] a:visited {
+  color: var(--de-link-visited) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] a:hover {
+  color: var(--de-accent) !important;
+}
+
+/* Header, search box, category select, and top navigation */
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-top,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-gb,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-header,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-header__main,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .vl-flyout-nav,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .hl-cat-nav {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh a,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-header a,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .vl-flyout-nav a,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .hl-cat-nav a {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-ac-box,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-ac-box2,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-ac,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-search-input {
+  background-color: var(--de-bg-subtle) !important;
+  color: var(--de-text) !important;
+  border-color: var(--de-border-strong) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-ac::placeholder {
+  color: var(--de-text-muted) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-sb,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-cat,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-cat-box {
+  background-color: var(--de-bg-subtle) !important;
+  color: var(--de-text) !important;
+  border-color: var(--de-border-strong) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gh-btn,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-search-button {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+/* Search autocomplete, header flyouts, and menus */
+html[data-darkext-active="true"][data-darkext-site="ebay"] #gAC,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .ui-autocomplete,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-flyout,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-popover,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-eb-o,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .hl-cat-nav__flyout,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .vl-flyout-nav__flyout {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+  box-shadow: 0 8px 24px var(--de-shadow) !important;
+}
+
+/* Search results, item cards, and controls bar */
+html[data-darkext-active="true"][data-darkext-site="ebay"] .srp-results,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .srp-controls {
+  background-color: var(--de-bg) !important;
+  border-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-card,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__wrapper,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .srp-save-search {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item:hover,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-card:hover {
+  border-color: var(--de-border-strong) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__title,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__price,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-card__title,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-card__price {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .s-item__title:hover {
+  color: var(--de-link) !important;
+}
+
+/* Left refinement rail */
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__left__nav,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__body,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .srp-rail__left,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__main__list {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__item__title,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__select__aspect {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__body a,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__body label {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-refine__body a:hover {
+  color: var(--de-link) !important;
+}
+
+/* View Item page, Buybox, Seller Info, and Item Specifics */
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-buybox,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-sellercard-atf,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-store-information,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .d-stores-info-categories,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .ux-layout-section,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .ux-layout-section-evo,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .ux-section,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .vi-VR-cvippanel,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fdbk-container {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-msku__select-box,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .listbox-button__control,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-menu-button__button {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+/* Tabs */
+html[data-darkext-active="true"][data-darkext-site="ebay"] .tabs__items,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-tabs__items {
+  background-color: var(--de-bg-elevated) !important;
+  border-bottom: 1px solid var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .tabs__item,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-tabs__item {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .tabs__item[aria-selected="true"],
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-tabs__item--current {
+  background-color: var(--de-bg-hover) !important;
+  border-bottom-color: var(--de-accent) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .tabs__panel,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .tabs__content {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+/* Dialogs, menus, popovers, pagination */
+html[data-darkext-active="true"][data-darkext-site="ebay"] .lightbox-dialog__window,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .drawer-dialog__window,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .listbox__options,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .menu-button__menu,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-menu__items,
+html[data-darkext-active="true"][data-darkext-site="ebay"] [role="dialog"],
+html[data-darkext-active="true"][data-darkext-site="ebay"] [role="menu"],
+html[data-darkext-active="true"][data-darkext-site="ebay"] [role="listbox"] {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+  box-shadow: 0 8px 24px var(--de-shadow) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .listbox__option:hover,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-menu__item:hover {
+  background-color: var(--de-bg-hover) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .pagination,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .pagination__items {
+  background-color: transparent !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .pagination__item,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .pagination__next,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .pagination__prev {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .pagination__item[aria-current="page"] {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+/* Inputs, selects, tables, and buttons */
+html[data-darkext-active="true"][data-darkext-site="ebay"] input,
+html[data-darkext-active="true"][data-darkext-site="ebay"] select,
+html[data-darkext-active="true"][data-darkext-site="ebay"] textarea {
+  background-color: var(--de-bg-subtle) !important;
+  color: var(--de-text) !important;
+  border-color: var(--de-border-strong) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .btn,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .btn--secondary,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-btn--secondary {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .btn:hover,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .btn--secondary:hover {
+  background-color: var(--de-bg-hover) !important;
+}
+
+/* Preserve high-contrast CTA buttons */
+html[data-darkext-active="true"][data-darkext-site="ebay"] .btn--primary,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .fake-btn--primary,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-bin-action .ux-call-to-action,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-bid-action .ux-call-to-action,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #binBtn_btn_1,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #bidBtn_btn_1 {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .x-atc-action .ux-call-to-action,
+html[data-darkext-active="true"][data-darkext-site="ebay"] #atcBtn_btn_1 {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] table,
+html[data-darkext-active="true"][data-darkext-site="ebay"] th,
+html[data-darkext-active="true"][data-darkext-site="ebay"] td {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+/* Seller ratings & feedback badges */
+html[data-darkext-active="true"][data-darkext-site="ebay"] .positive-fdbk {
+  color: var(--de-success) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .negative-fdbk {
+  color: var(--de-danger) !important;
+}
+
+/* Footer */
+html[data-darkext-active="true"][data-darkext-site="ebay"] #glbfooter,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gh-footer,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gf-t,
+html[data-darkext-active="true"][data-darkext-site="ebay"] .gf-b {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text-secondary) !important;
+}
+
+/* Protect product photos, seller rating stars, and video */
+html[data-darkext-active="true"][data-darkext-site="ebay"] img,
+html[data-darkext-active="true"][data-darkext-site="ebay"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"] .star-rating {
+  filter: none !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="ebay"][data-darkext-dim-images="true"] .s-item__image-img,
+html[data-darkext-active="true"][data-darkext-site="ebay"][data-darkext-dim-images="true"] .ux-image-carousel-item img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

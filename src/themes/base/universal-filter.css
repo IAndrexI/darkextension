@@ -1,0 +1,44 @@
+/* DarkExtension — Universal Filter Mode Base Stylesheet
+ * Scoped strictly under html[data-darkext-active="true"][data-darkext-mode="filter"].
+ * Inverts page luminance while un-inverting raster media, canvases, iframes, and UI overlays.
+ */
+
+html[data-darkext-active="true"][data-darkext-mode="filter"] {
+  background-color: #ededed !important;
+  color-scheme: light !important;
+  filter:
+    invert(1)
+    hue-rotate(180deg)
+    brightness(var(--de-filter-brightness, 1))
+    contrast(var(--de-filter-contrast, 1))
+    sepia(var(--de-filter-sepia, 0))
+    grayscale(var(--de-filter-grayscale, 0)) !important;
+}
+
+/* Re-invert visual media so photos, videos, and embedded frames render naturally */
+html[data-darkext-active="true"][data-darkext-mode="filter"] img,
+html[data-darkext-active="true"][data-darkext-mode="filter"] video,
+html[data-darkext-active="true"][data-darkext-mode="filter"] canvas,
+html[data-darkext-active="true"][data-darkext-mode="filter"] iframe,
+html[data-darkext-active="true"][data-darkext-mode="filter"] embed,
+html[data-darkext-active="true"][data-darkext-mode="filter"] object,
+html[data-darkext-active="true"][data-darkext-mode="filter"] svg image {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Apply image dimming on re-inverted images and videos when enabled */
+html[data-darkext-active="true"][data-darkext-mode="filter"][data-darkext-dim-images="true"] img,
+html[data-darkext-active="true"][data-darkext-mode="filter"][data-darkext-dim-images="true"] video {
+  filter: invert(1) hue-rotate(180deg) brightness(var(--de-image-brightness, 0.9));
+}
+
+/* Prevent double inversion for nested images inside canvas/svg/video contexts */
+html[data-darkext-active="true"][data-darkext-mode="filter"] canvas img,
+html[data-darkext-active="true"][data-darkext-mode="filter"] video img {
+  filter: none;
+}
+
+/* Keep DarkExtension's Shadow DOM toast overlay un-inverted */
+html[data-darkext-active="true"][data-darkext-mode="filter"] #darkext-toast-host {
+  filter: invert(1) hue-rotate(180deg);
+}

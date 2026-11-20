@@ -1,0 +1,96 @@
+/* DarkExtension Site Theme: Popular Web Bundle (Quora, PayPal, IMDb, Fandom, Booking.com, Airbnb) */
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] body,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] main,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] #__next,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] #root,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .main-container,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .ipc-page-content-container,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .page__main,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .bui-page-body {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] header,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] nav,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] footer,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .q-box,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .ipc-card,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .ipc-list-card,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .pp-card,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .vx_card,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] [data-testid="property-card"],
+html[data-darkext-active="true"][data-darkext-site="popular-web"] [data-testid="card-container"],
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .bui-card,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .wikia-page-header,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .portable-infobox,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] [role="dialog"],
+html[data-darkext-active="true"][data-darkext-site="popular-web"] [role="menu"] {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] h1,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] h2,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] h3,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] h4,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] p,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] li {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .ipc-metadata-list-item__list-content-item,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .bui-f-color-grayscale {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] input,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] select,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] textarea {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] button[type="submit"],
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .bui-button--primary,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .vx_btn-primary {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] table,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] th,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] td {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+/* Preserve photos, posters, avatars, videos, and maps */
+html[data-darkext-active="true"][data-darkext-site="popular-web"] img,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"] canvas,
+html[data-darkext-active="true"][data-darkext-site="popular-web"] .mapboxgl-map {
+  filter: none !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="popular-web"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

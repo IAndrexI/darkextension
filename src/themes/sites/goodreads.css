@@ -1,0 +1,88 @@
+/* DarkExtension Site Theme: Goodreads */
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] body,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .mainContent,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .mainContentFloat,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .BookPage,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .BookPage__mainContent,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .PageFrame,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .PageFrame__main {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .siteHeader,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .siteHeader__topFullImageContainer,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] header,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .gr-box,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .ReviewCard,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .BookCard,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .modal__content,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] [role="dialog"],
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .siteFooter,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] footer {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] h1,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] h2,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] h3,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .Text__title1,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .Text__title2,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .reviewText,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .bookTitle {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .Text__subdued,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .greyText,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .BookPageMetadataSection__genre {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] a,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .gr-hyperlink {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] input,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] select,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] textarea,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .searchBox__input {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .wtrToRead,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .Button--primary {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] .tableList,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] table,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] th,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] td {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"] img,
+html[data-darkext-active="true"][data-darkext-site="goodreads"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="goodreads"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

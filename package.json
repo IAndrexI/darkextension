@@ -1,0 +1,22 @@
+{
+  "name": "darkextension",
+  "version": "1.0.0",
+  "description": "Universal zero-build-step Chrome Manifest V3 dark mode extension with curated site themes, adaptive dynamic engine, and customizable presets.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "icons": "node scripts/generate-icons.mjs",
+    "package": "node scripts/package-zip.mjs"
+  },
+  "keywords": [
+    "chrome-extension",
+    "manifest-v3",
+    "dark-mode",
+    "universal-dark-mode",
+    "themes"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IAndrexI/darkextension.git"
+  }
+}

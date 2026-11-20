@@ -1,0 +1,86 @@
+/* DarkExtension — Universal Dynamic Mode Base Stylesheet
+ * Scoped strictly under html[data-darkext-active="true"][data-darkext-mode="dynamic"].
+ * Uses :where(...) for fallback element rules so site/dynamic specificity stays clean.
+ */
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] {
+  background-color: var(--de-bg);
+  color: var(--de-text);
+  border-color: var(--de-border);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] body {
+  background-color: var(--de-bg);
+  color: var(--de-text);
+  border-color: var(--de-border);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, label, legend, caption) {
+  color: var(--de-text);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(a, a:link) {
+  color: var(--de-link);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(a:visited) {
+  color: var(--de-link-visited);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="image"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]), textarea, select) {
+  background-color: var(--de-bg-elevated);
+  color: var(--de-text);
+  border-color: var(--de-border);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(input, textarea)::placeholder {
+  color: var(--de-text-muted);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(option, optgroup) {
+  background-color: var(--de-bg-elevated);
+  color: var(--de-text);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(button, [role="button"], input[type="submit"], input[type="button"], input[type="reset"]) {
+  background-color: var(--de-bg-subtle);
+  color: var(--de-text);
+  border-color: var(--de-border);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(table, th, td, thead, tbody, tfoot, tr) {
+  border-color: var(--de-border);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(th) {
+  background-color: var(--de-bg-subtle);
+  color: var(--de-text);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(pre, code, kbd, samp) {
+  background-color: var(--de-bg-elevated);
+  color: var(--de-text);
+  border-color: var(--de-border);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(blockquote) {
+  background-color: var(--de-bg-elevated);
+  color: var(--de-text-secondary);
+  border-color: var(--de-border-strong);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(hr) {
+  border-color: var(--de-border);
+  background-color: var(--de-border);
+}
+
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(fieldset, dialog, [role="dialog"], [role="menu"], [role="listbox"]) {
+  background-color: var(--de-bg-elevated);
+  color: var(--de-text);
+  border-color: var(--de-border);
+}
+
+/* Preserve natural colors on media elements */
+html[data-darkext-active="true"][data-darkext-mode="dynamic"] :where(img, video, picture, canvas, iframe, svg) {
+  background-color: transparent;
+}

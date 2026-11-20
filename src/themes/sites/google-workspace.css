@@ -1,0 +1,110 @@
+/* DarkExtension Site Theme: Google Workspace (Docs, Calendar, Scholar, Forms) */
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] body,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #docs-editor-container,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .kix-appview-editor,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_top,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_bdy,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_res_ccl,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] [role="main"] {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+/* Google Docs chrome, menus, toolbars, rulers */
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #docs-chrome,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #docs-header,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #docs-toolbar-wrapper,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .docs-menubar,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .docs-titlebar-buttons,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .docs-companion-app-switcher-container,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .navigation-widget,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .docs-ruler {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .docs-title-input {
+  background-color: var(--de-bg-subtle) !important;
+  color: var(--de-text) !important;
+  border-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .goog-menu,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .goog-menuitem,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .modal-dialog,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] [role="menu"],
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] [role="dialog"] {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+/* Google Calendar grid & cards */
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] [role="grid"],
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] [role="gridcell"],
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] [role="columnheader"],
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .tEhMVd,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .YqtBEc {
+  background-color: var(--de-bg) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+/* Google Scholar results & sidebar */
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_hdr,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_ab,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_lnv,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .gs_r,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .gs_ri,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_ftr {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .gs_a {
+  color: var(--de-success) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .gs_rs,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .gs_fl {
+  color: var(--de-text-secondary) !important;
+}
+
+/* Google Forms cards */
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .freebirdFormviewerViewFormContentWrapper,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .Qr7Oae,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] .geS5n {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] input,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] select,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] textarea {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] img,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] canvas {
+  filter: none !important;
+}

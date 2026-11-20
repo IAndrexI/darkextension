@@ -1,0 +1,95 @@
+/* DarkExtension Site Theme: Craigslist */
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] body,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .page-container,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] #pagecontainer,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .cl-home-page,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .cl-search-page,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .posting,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .body {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] header,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .global-header,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .cl-app-header,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] #leftbar,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] #rightbar,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .cl-filters-panel,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .search-options,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .cl-search-result,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .result-row,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .attrgroup,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .cl-hub-section,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] footer,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .cl-app-footer {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] h1,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] h2,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] h3,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] h4,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .postingtitletext,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] #postingbody {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .result-date,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .result-hood,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .postinginfos,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .meta {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .result-price,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .priceinfo {
+  background-color: var(--de-bg-subtle) !important;
+  color: var(--de-success) !important;
+  border-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] a:visited {
+  color: var(--de-link-visited) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] input,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] select,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] textarea {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] button,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .reply-button {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] img,
+html[data-darkext-active="true"][data-darkext-site="craigslist"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"] .leaflet-container {
+  filter: none !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="craigslist"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

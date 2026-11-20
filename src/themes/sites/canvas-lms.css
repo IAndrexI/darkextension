@@ -1,0 +1,101 @@
+/* DarkExtension Site Theme: Canvas LMS */
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] body,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-app,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-Layout-wrapper,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-Layout-contentMain,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] #main,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] #content,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] #right-side,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] #left-side {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] #header,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-app-header,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-app-header__main-navigation,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-Dashboard-header,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] #breadcrumbs,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-DashboardCard,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-DashboardCard__header_content,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .context_module,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ig-list,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ig-row,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .item-group-container,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ui-dialog,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ui-widget-content,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] [role="dialog"] {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ig-header,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .context_module .header {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] h1,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] h2,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] h3,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .user_content,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-DashboardCard__header-title {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-DashboardCard__header-subtitle,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ig-details {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] input,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] select,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] textarea {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .btn,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .Button {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .btn-primary,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .Button--primary {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] table,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-Table th,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ic-Table td {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] img,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

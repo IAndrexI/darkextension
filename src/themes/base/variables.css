@@ -1,0 +1,183 @@
+/* DarkExtension — Shared CSS Custom Properties & Presets
+ * Scoped strictly to html[data-darkext-active="true"] so turning off restores original styles.
+ */
+
+html[data-darkext-active="true"] {
+  color-scheme: dark;
+
+  /* Runtime filter/image adjustment defaults (overridden by #darkext-runtime-vars) */
+  --de-image-brightness: 0.9;
+  --de-filter-brightness: 1;
+  --de-filter-contrast: 1;
+  --de-filter-sepia: 0;
+  --de-filter-grayscale: 0;
+
+  /* Default preset: Midnight */
+  --de-bg: #121418;
+  --de-bg-elevated: #1a1d24;
+  --de-bg-subtle: #222630;
+  --de-bg-hover: #2a2f3c;
+  --de-border: #2e3442;
+  --de-border-strong: #3e4658;
+  --de-text: #e6e9ef;
+  --de-text-secondary: #a8b0c0;
+  --de-text-muted: #788296;
+  --de-link: #7ab3ff;
+  --de-link-visited: #b095ff;
+  --de-accent: #6c8cff;
+  --de-accent-hover: #849fff;
+  --de-accent-text: #ffffff;
+  --de-danger: #f87171;
+  --de-success: #4ade80;
+  --de-warning: #fbbf24;
+  --de-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --de-scrollbar-track: #121418;
+  --de-scrollbar-thumb: #323846;
+}
+
+html[data-darkext-active="true"][data-darkext-preset="midnight"] {
+  --de-bg: #121418;
+  --de-bg-elevated: #1a1d24;
+  --de-bg-subtle: #222630;
+  --de-bg-hover: #2a2f3c;
+  --de-border: #2e3442;
+  --de-border-strong: #3e4658;
+  --de-text: #e6e9ef;
+  --de-text-secondary: #a8b0c0;
+  --de-text-muted: #788296;
+  --de-link: #7ab3ff;
+  --de-link-visited: #b095ff;
+  --de-accent: #6c8cff;
+  --de-accent-hover: #849fff;
+  --de-accent-text: #ffffff;
+  --de-danger: #f87171;
+  --de-success: #4ade80;
+  --de-warning: #fbbf24;
+  --de-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --de-scrollbar-track: #121418;
+  --de-scrollbar-thumb: #323846;
+}
+
+html[data-darkext-active="true"][data-darkext-preset="oled"] {
+  --de-bg: #000000;
+  --de-bg-elevated: #0c0c0e;
+  --de-bg-subtle: #16161a;
+  --de-bg-hover: #1f1f26;
+  --de-border: #26262e;
+  --de-border-strong: #383844;
+  --de-text: #f0f0f5;
+  --de-text-secondary: #a0a0b0;
+  --de-text-muted: #707080;
+  --de-link: #66b2ff;
+  --de-link-visited: #a88bff;
+  --de-accent: #5c9eff;
+  --de-accent-hover: #7ab0ff;
+  --de-accent-text: #ffffff;
+  --de-danger: #ff6b6b;
+  --de-success: #34d399;
+  --de-warning: #fbbf24;
+  --de-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+  --de-scrollbar-track: #000000;
+  --de-scrollbar-thumb: #2c2c36;
+}
+
+html[data-darkext-active="true"][data-darkext-preset="warm"] {
+  --de-bg: #181512;
+  --de-bg-elevated: #221e19;
+  --de-bg-subtle: #2c2620;
+  --de-bg-hover: #362f28;
+  --de-border: #3d352d;
+  --de-border-strong: #52473c;
+  --de-text: #ebe3d5;
+  --de-text-secondary: #b8aa96;
+  --de-text-muted: #8a7c6a;
+  --de-link: #e0a96d;
+  --de-link-visited: #c98e9e;
+  --de-accent: #d99b52;
+  --de-accent-hover: #e6af6e;
+  --de-accent-text: #181512;
+  --de-danger: #e57373;
+  --de-success: #81c784;
+  --de-warning: #ffb74d;
+  --de-shadow: 0 8px 24px rgba(10, 7, 4, 0.6);
+  --de-scrollbar-track: #181512;
+  --de-scrollbar-thumb: #473d33;
+}
+
+html[data-darkext-active="true"][data-darkext-preset="slate"] {
+  --de-bg: #0f172a;
+  --de-bg-elevated: #1e293b;
+  --de-bg-subtle: #273549;
+  --de-bg-hover: #334155;
+  --de-border: #3b4b63;
+  --de-border-strong: #4e6280;
+  --de-text: #f1f5f9;
+  --de-text-secondary: #94a3b8;
+  --de-text-muted: #64748b;
+  --de-link: #38bdf8;
+  --de-link-visited: #a78bfa;
+  --de-accent: #60a5fa;
+  --de-accent-hover: #93c5fd;
+  --de-accent-text: #0f172a;
+  --de-danger: #f87171;
+  --de-success: #4ade80;
+  --de-warning: #facc15;
+  --de-shadow: 0 8px 24px rgba(2, 6, 23, 0.65);
+  --de-scrollbar-track: #0f172a;
+  --de-scrollbar-thumb: #334155;
+}
+
+html[data-darkext-active="true"][data-darkext-preset="nord"] {
+  --de-bg: #242933;
+  --de-bg-elevated: #2e3440;
+  --de-bg-subtle: #3b4252;
+  --de-bg-hover: #434c5e;
+  --de-border: #4c566a;
+  --de-border-strong: #5e6a82;
+  --de-text: #eceff4;
+  --de-text-secondary: #d8dee9;
+  --de-text-muted: #9aa5ba;
+  --de-link: #88c0d0;
+  --de-link-visited: #b48ead;
+  --de-accent: #81a1c1;
+  --de-accent-hover: #8fbcbb;
+  --de-accent-text: #242933;
+  --de-danger: #bf616a;
+  --de-success: #a3be8c;
+  --de-warning: #ebcb8b;
+  --de-shadow: 0 8px 24px rgba(15, 18, 24, 0.55);
+  --de-scrollbar-track: #242933;
+  --de-scrollbar-thumb: #4c566a;
+}
+
+/* Scrollbar & selection refinements for curated site themes and dynamic mode */
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) {
+  scrollbar-color: var(--de-scrollbar-thumb) var(--de-scrollbar-track);
+}
+
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) ::-webkit-scrollbar-track {
+  background: var(--de-scrollbar-track);
+}
+
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) ::-webkit-scrollbar-thumb {
+  background: var(--de-scrollbar-thumb);
+  border-radius: 5px;
+  border: 2px solid var(--de-scrollbar-track);
+}
+
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"]) ::selection {
+  background-color: var(--de-accent);
+  color: var(--de-accent-text);
+}
+
+/* Image dimming in site-theme and dynamic modes (never double-dim picture > img) */
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"])[data-darkext-dim-images="true"] img,
+html[data-darkext-active="true"]:not([data-darkext-mode="filter"])[data-darkext-dim-images="true"] video {
+  filter: brightness(var(--de-image-brightness, 0.9));
+  transition: filter 0.15s ease;
+}

@@ -1,0 +1,212 @@
+[
+  {
+    "id": "amazon",
+    "name": "Amazon",
+    "category": "Shopping",
+    "domains": [
+      "amazon.com",
+      "amazon.co.uk",
+      "amazon.de",
+      "amazon.fr",
+      "amazon.ca",
+      "amazon.co.jp",
+      "amazon.in",
+      "amazon.es",
+      "amazon.it",
+      "amazon.com.au",
+      "amazon.com.br",
+      "amazon.com.mx",
+      "amazon.nl",
+      "amazon.se",
+      "amazon.pl",
+      "smile.amazon.com",
+      "*.amazon.*"
+    ],
+    "cssFile": "src/themes/sites/amazon.css",
+    "description": "Full dark theme for Amazon storefronts, search results, product pages, buybox, reviews, cart, and navigation flyouts across all regional domains."
+  },
+  {
+    "id": "ebay",
+    "name": "eBay",
+    "category": "Shopping",
+    "domains": [
+      "ebay.com",
+      "ebay.co.uk",
+      "ebay.de",
+      "ebay.fr",
+      "ebay.ca",
+      "ebay.com.au",
+      "ebay.it",
+      "ebay.es",
+      "*.ebay.*"
+    ],
+    "cssFile": "src/themes/sites/ebay.css",
+    "description": "Comprehensive dark theme for eBay search listings, refinement filters, item detail pages, buybox, seller profiles, tabs, and checkout dialogs."
+  },
+  {
+    "id": "walmart",
+    "name": "Walmart",
+    "category": "Shopping",
+    "domains": [
+      "walmart.com",
+      "walmart.ca"
+    ],
+    "cssFile": "src/themes/sites/walmart.css",
+    "description": "Dark mode styling for Walmart product grids, department drawers, item pages, pickup/delivery banners, and cart drawer."
+  },
+  {
+    "id": "target",
+    "name": "Target",
+    "category": "Shopping",
+    "domains": [
+      "target.com"
+    ],
+    "cssFile": "src/themes/sites/target.css",
+    "description": "Clean dark theme for Target browsing, search cards, fulfillment options, product specifications, and cart slideouts."
+  },
+  {
+    "id": "etsy",
+    "name": "Etsy",
+    "category": "Shopping",
+    "domains": [
+      "etsy.com"
+    ],
+    "cssFile": "src/themes/sites/etsy.css",
+    "description": "Artisan-friendly dark theme for Etsy marketplace listings, shop pages, reviews, filters, and messaging drawers."
+  },
+  {
+    "id": "bestbuy",
+    "name": "Best Buy",
+    "category": "Shopping",
+    "domains": [
+      "bestbuy.com",
+      "bestbuy.ca"
+    ],
+    "cssFile": "src/themes/sites/bestbuy.css",
+    "description": "Dark mode theme for Best Buy electronics listings, spec comparison tables, reviews, and cart flows."
+  },
+  {
+    "id": "aliexpress",
+    "name": "AliExpress",
+    "category": "Shopping",
+    "domains": [
+      "aliexpress.com",
+      "aliexpress.us"
+    ],
+    "cssFile": "src/themes/sites/aliexpress.css",
+    "description": "Dark theme for AliExpress product search, SKU selectors, store banners, shipping modals, and order pages."
+  },
+  {
+    "id": "newegg",
+    "name": "Newegg",
+    "category": "Shopping",
+    "domains": [
+      "newegg.com",
+      "newegg.ca"
+    ],
+    "cssFile": "src/themes/sites/newegg.css",
+    "description": "High-contrast dark theme for Newegg PC component listings, spec tables, PC Builder, and customer reviews."
+  },
+  {
+    "id": "wikipedia",
+    "name": "Wikipedia & Wikimedia",
+    "category": "Reference",
+    "domains": [
+      "wikipedia.org",
+      "wiktionary.org",
+      "wikimedia.org",
+      "wikiquote.org",
+      "wikibooks.org"
+    ],
+    "cssFile": "src/themes/sites/wikipedia.css",
+    "description": "Reader-focused dark theme for Wikipedia and sister Wikimedia projects, including Vector 2022 sidebars, infoboxes, tables, and references."
+  },
+  {
+    "id": "google-workspace",
+    "name": "Google Workspace",
+    "category": "Productivity",
+    "domains": [
+      "docs.google.com",
+      "calendar.google.com",
+      "scholar.google.com",
+      "forms.google.com"
+    ],
+    "cssFile": "src/themes/sites/google-workspace.css",
+    "description": "Dark interface for Google Docs, Google Calendar, Google Scholar, and Google Forms while preserving document legibility."
+  },
+  {
+    "id": "craigslist",
+    "name": "Craigslist",
+    "category": "Jobs & Real Estate",
+    "domains": [
+      "craigslist.org"
+    ],
+    "cssFile": "src/themes/sites/craigslist.css",
+    "description": "Modern dark styling for Craigslist directory boards, gallery search results, map/list filters, and classified posts."
+  },
+  {
+    "id": "indeed",
+    "name": "Indeed",
+    "category": "Jobs & Real Estate",
+    "domains": [
+      "indeed.com"
+    ],
+    "cssFile": "src/themes/sites/indeed.css",
+    "description": "Comfortable dark mode for Indeed job search feeds, split-pane job descriptions, salary badges, and application modals."
+  },
+  {
+    "id": "zillow",
+    "name": "Zillow",
+    "category": "Jobs & Real Estate",
+    "domains": [
+      "zillow.com"
+    ],
+    "cssFile": "src/themes/sites/zillow.css",
+    "description": "Dark theme for Zillow property cards, filter bars, home detail overlays, and mortgage calculators while keeping map tiles untouched."
+  },
+  {
+    "id": "goodreads",
+    "name": "Goodreads",
+    "category": "Community & Learning",
+    "domains": [
+      "goodreads.com"
+    ],
+    "cssFile": "src/themes/sites/goodreads.css",
+    "description": "Warm-ready dark theme for Goodreads book pages, shelves, reading challenges, and community reviews."
+  },
+  {
+    "id": "hackernews",
+    "name": "Hacker News",
+    "category": "Community & Learning",
+    "domains": [
+      "news.ycombinator.com"
+    ],
+    "cssFile": "src/themes/sites/hackernews.css",
+    "description": "Crisp low-glare dark theme for Hacker News frontpage threads, nested comment trees, submissions, and user profiles."
+  },
+  {
+    "id": "canvas-lms",
+    "name": "Canvas LMS",
+    "category": "Community & Learning",
+    "domains": [
+      "instructure.com"
+    ],
+    "cssFile": "src/themes/sites/canvas-lms.css",
+    "description": "Dark mode for Instructure Canvas LMS dashboards, course modules, assignments, gradebooks, and SpeedGrader panels."
+  },
+  {
+    "id": "popular-web",
+    "name": "Popular Web Bundle",
+    "category": "Travel & Finance",
+    "domains": [
+      "quora.com",
+      "paypal.com",
+      "imdb.com",
+      "fandom.com",
+      "booking.com",
+      "airbnb.com"
+    ],
+    "cssFile": "src/themes/sites/popular-web.css",
+    "description": "Unified dark theme covering Booking.com, Airbnb, PayPal, IMDb, Quora, and Fandom with protected photos and media."
+  }
+]

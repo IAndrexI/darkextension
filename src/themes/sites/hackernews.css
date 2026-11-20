@@ -1,0 +1,96 @@
+/* DarkExtension Site Theme: Hacker News */
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] body {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] #hnmain,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] table,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] td,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] tr {
+  background-color: var(--de-bg-elevated) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] td[bgcolor="#ff6600"] {
+  background-color: var(--de-bg-subtle) !important;
+  border-bottom: 2px solid #ff6600 !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .pagetop,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .pagetop a,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .hnname a {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .titleline > a {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .titleline > a:visited {
+  color: var(--de-text-muted) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] a:visited {
+  color: var(--de-link-visited) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .subtext,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .subline,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .comhead,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .sitebit,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .rank,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .age a,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .yclinks a {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .commtext,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .c00 {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .c5a,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .c73,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .c82 {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .c88,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .c9c,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] .cae {
+  color: var(--de-text-muted) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] pre,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] code {
+  background-color: var(--de-bg-subtle) !important;
+  color: var(--de-text) !important;
+  border-color: var(--de-border) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] input,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] textarea,
+html[data-darkext-active="true"][data-darkext-site="hackernews"] select {
+  background-color: var(--de-bg-subtle) !important;
+  border: 1px solid var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="hackernews"] input[type="submit"] {
+  background-color: var(--de-accent) !important;
+  border-color: var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}

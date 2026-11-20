@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1b2236"/>
+      <stop offset="100%" stop-color="#0b0e15"/>
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8da8ff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#4e62a8" stop-opacity="0.25"/>
+    </linearGradient>
+    <linearGradient id="moonGrad" x1="28" y1="26" x2="96" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c7d5ff"/>
+      <stop offset="48%" stop-color="#7c9bff"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6c8cff" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#6c8cff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="3"/>
+  <circle cx="62" cy="64" r="44" fill="url(#glowGrad)"/>
+  <path d="M74.5 29.5A34 34 0 1 0 98.5 85.2A27 27 0 0 1 74.5 29.5Z" fill="url(#moonGrad)"/>
+  <path d="M88 30L90.8 37.2L98 40L90.8 42.8L88 50L85.2 42.8L78 40L85.2 37.2Z" fill="#eef2ff"/>
+</svg>

@@ -1,0 +1,83 @@
+/* DarkExtension Site Theme: Target */
+
+html[data-darkext-active="true"][data-darkext-site="target"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] body,
+html[data-darkext-active="true"][data-darkext-site="target"] #__next,
+html[data-darkext-active="true"][data-darkext-site="target"] main,
+html[data-darkext-active="true"][data-darkext-site="target"] #pageBodyContainer {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] header,
+html[data-darkext-active="true"][data-darkext-site="target"] #headerPrimary,
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="@web/Header"],
+html[data-darkext-active="true"][data-darkext-site="target"] footer,
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="@web/Footer"] {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="@web/ProductCard/ProductCardVariantDefault"],
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="product-card"],
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="fulfillment-cell"],
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="item-details-specifications"],
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="reviews-section"],
+html[data-darkext-active="true"][data-darkext-site="target"] [role="dialog"],
+html[data-darkext-active="true"][data-darkext-site="target"] [role="menu"],
+html[data-darkext-active="true"][data-darkext-site="target"] [role="tabpanel"] {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] h1,
+html[data-darkext-active="true"][data-darkext-site="target"] h2,
+html[data-darkext-active="true"][data-darkext-site="target"] h3,
+html[data-darkext-active="true"][data-darkext-site="target"] p,
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="product-price"],
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="product-title"] {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] input,
+html[data-darkext-active="true"][data-darkext-site="target"] select,
+html[data-darkext-active="true"][data-darkext-site="target"] textarea,
+html[data-darkext-active="true"][data-darkext-site="target"] #search {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] button {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="shippingButton"],
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="orderPickupButton"],
+html[data-darkext-active="true"][data-darkext-site="target"] [data-test="addToCartButton"] {
+  background-color: #cc0000 !important;
+  border-color: #cc0000 !important;
+  color: #ffffff !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"] img,
+html[data-darkext-active="true"][data-darkext-site="target"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="target"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}

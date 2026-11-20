@@ -1,0 +1,84 @@
+/* DarkExtension Site Theme: Newegg */
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] {
+  color-scheme: dark;
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] body,
+html[data-darkext-active="true"][data-darkext-site="newegg"] #app,
+html[data-darkext-active="true"][data-darkext-site="newegg"] main,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .page-content,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .page-section {
+  background-color: var(--de-bg) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] header,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .header2021,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .item-cell,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .item-container,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .filter-box,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .product-buy-box,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .tab-panes,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .modal-content,
+html[data-darkext-active="true"][data-darkext-site="newegg"] [role="dialog"],
+html[data-darkext-active="true"][data-darkext-site="newegg"] footer {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] h1,
+html[data-darkext-active="true"][data-darkext-site="newegg"] h2,
+html[data-darkext-active="true"][data-darkext-site="newegg"] h3,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .item-title,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .price-current,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .product-title {
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] .price-was,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .item-features,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .item-info-extra {
+  color: var(--de-text-secondary) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] a {
+  color: var(--de-link) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] input,
+html[data-darkext-active="true"][data-darkext-site="newegg"] select,
+html[data-darkext-active="true"][data-darkext-site="newegg"] textarea,
+html[data-darkext-active="true"][data-darkext-site="newegg"] .header2021-search-box input {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] .btn-primary {
+  background-color: #f39c12 !important;
+  border-color: #e67e22 !important;
+  color: #111111 !important;
+  font-weight: 600 !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] .table-horizontal,
+html[data-darkext-active="true"][data-darkext-site="newegg"] table,
+html[data-darkext-active="true"][data-darkext-site="newegg"] th,
+html[data-darkext-active="true"][data-darkext-site="newegg"] td {
+  background-color: var(--de-bg-elevated) !important;
+  border-color: var(--de-border) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"] img,
+html[data-darkext-active="true"][data-darkext-site="newegg"] video {
+  filter: none;
+}
+
+html[data-darkext-active="true"][data-darkext-site="newegg"][data-darkext-dim-images="true"] img {
+  filter: brightness(var(--de-image-brightness, 0.9)) !important;
+}
