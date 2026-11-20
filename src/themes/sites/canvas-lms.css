@@ -33,8 +33,9 @@ html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ui-dialog,
 html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ui-widget-content,
 html[data-darkext-active="true"][data-darkext-site="canvas-lms"] [role="dialog"] {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border: 1px solid var(--de-border-strong) !important;
   color: var(--de-text) !important;
+  box-shadow: var(--de-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.4)) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .ig-header,
@@ -61,7 +62,7 @@ html[data-darkext-active="true"][data-darkext-site="canvas-lms"] a {
   color: var(--de-link) !important;
 }
 
-html[data-darkext-active="true"][data-darkext-site="canvas-lms"] input,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] input:not([type="submit"]):not([type="button"]):not([type="reset"]),
 html[data-darkext-active="true"][data-darkext-site="canvas-lms"] select,
 html[data-darkext-active="true"][data-darkext-site="canvas-lms"] textarea {
   background-color: var(--de-bg-subtle) !important;
@@ -77,10 +78,18 @@ html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .Button {
 }
 
 html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .btn-primary,
-html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .Button--primary {
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] .Button--primary,
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] button[type="submit"],
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] input[type="submit"] {
   background-color: var(--de-accent) !important;
-  border-color: var(--de-accent) !important;
+  border: 1px solid var(--de-accent) !important;
   color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="canvas-lms"] button[type="submit"] svg {
+  color: var(--de-accent-text) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="canvas-lms"] table,

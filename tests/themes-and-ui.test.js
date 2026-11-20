@@ -432,6 +432,7 @@ describe('Site Themes Registry & CSS Audit', () => {
       '--de-success',
       '--de-warning',
       '--de-shadow',
+      '--de-card-shadow',
       '--de-scrollbar-track',
       '--de-scrollbar-thumb',
       '--de-image-brightness',
@@ -477,15 +478,38 @@ describe('Site Themes Registry & CSS Audit', () => {
       }
     }
 
-    // Verify thorough coverage for flagship Amazon and eBay themes
+    // Verify thorough coverage & contrast regression rules for flagship Amazon and eBay themes
+    const allThemeCss = walkFiles(path.join(ROOT, 'src/themes'), (f) => f.endsWith('.css'));
+    for (const cssPath of allThemeCss) {
+      const content = fs.readFileSync(cssPath, 'utf8');
+      assert.equal(
+        content.includes('0 8px 24px var(--de-shadow)'),
+        false,
+        `Invalid double-shadow syntax found in ${path.relative(ROOT, cssPath)}`
+      );
+    }
+
     const amazonCss = fs.readFileSync(path.join(ROOT, 'src/themes/sites/amazon.css'), 'utf8');
-    for (const token of ['#navbar', '#dp', '.s-result-item', '#navFooter']) {
+    for (const token of ['#navbar', '#dp', '.s-result-item', '#navFooter', '.puis-card-container', '#nav-cart-count']) {
       assert.ok(amazonCss.includes(token), `amazon.css should style ${token}`);
     }
+    assert.match(
+      amazonCss,
+      /#nav-search-submit-button[\s\S]*?background-color:\s*transparent\s*!important/,
+      'amazon.css must keep #nav-search-submit-button background transparent so the search icon remains visible'
+    );
+
     const ebayCss = fs.readFileSync(path.join(ROOT, 'src/themes/sites/ebay.css'), 'utf8');
-    for (const token of ['#gh', '.srp-results', '.s-item', '#glbfooter']) {
+    for (const token of ['#gh', '.srp-results', '.s-item', '#glbfooter', '.s-item__wrapper', '.vl-card']) {
       assert.ok(ebayCss.includes(token), `ebay.css should style ${token}`);
     }
+    assert.ok(
+      ebayCss.includes('input:not([type="submit"]):not([type="button"]):not([type="reset"])'),
+      'ebay.css generic input rule must exclude submit/button/reset inputs'
+    );
+    const btnIdx = ebayCss.indexOf('[data-darkext-site="ebay"] .btn,');
+    const searchBtnIdx = ebayCss.indexOf('#gh-search-btn');
+    assert.ok(btnIdx !== -1 && searchBtnIdx > btnIdx, 'ebay.css must define #gh-search-btn after generic .btn');
   });
 });
 

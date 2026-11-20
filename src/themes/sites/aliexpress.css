@@ -23,8 +23,9 @@ html[data-darkext-active="true"][data-darkext-site="aliexpress"] .comet-select-d
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] [role="dialog"],
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] footer {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border: 1px solid var(--de-border-strong) !important;
   color: var(--de-text) !important;
+  box-shadow: var(--de-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.4)) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] h1,
@@ -44,7 +45,7 @@ html[data-darkext-active="true"][data-darkext-site="aliexpress"] a {
   color: var(--de-link) !important;
 }
 
-html[data-darkext-active="true"][data-darkext-site="aliexpress"] input,
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] input:not([type="submit"]):not([type="button"]):not([type="reset"]),
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] select,
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] textarea,
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] #search-words {
@@ -54,10 +55,22 @@ html[data-darkext-active="true"][data-darkext-site="aliexpress"] #search-words {
 }
 
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] .comet-btn-primary,
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] button[type="submit"],
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] input[type="submit"],
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] [class*="search--submit"],
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] button[aria-label*="Search" i],
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] [class*="add-to-cart"] {
   background-color: var(--de-accent) !important;
-  border-color: var(--de-accent) !important;
+  border: 1px solid var(--de-accent) !important;
   color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] button[type="submit"] svg,
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] [class*="search--submit"] svg,
+html[data-darkext-active="true"][data-darkext-site="aliexpress"] button[aria-label*="Search" i] svg {
+  color: var(--de-accent-text) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="aliexpress"] table,

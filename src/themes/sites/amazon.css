@@ -54,7 +54,7 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-color-link {
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] a:hover,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-link-normal:hover {
-  color: var(--de-accent) !important;
+  color: var(--de-accent-hover) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-color-success {
@@ -82,7 +82,7 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .savingsPercentage 
   color: var(--de-danger) !important;
 }
 
-/* Navbar, belt, subnav, and search bar */
+/* Navbar, belt, subnav, cart, and search bar */
 html[data-darkext-active="true"][data-darkext-site="amazon"] #navbar,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-belt {
   background-color: var(--de-bg-elevated) !important;
@@ -104,23 +104,42 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-main a,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-subnav a,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-subnav .nav-a-content,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #navbar .nav-line-1,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #navbar .nav-line-2 {
+html[data-darkext-active="true"][data-darkext-site="amazon"] #navbar .nav-line-2,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-cart,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-cart-text-container {
   color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-cart-count {
+  color: #ff9900 !important;
+  font-weight: 700 !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-bar-form {
   background-color: var(--de-bg) !important;
-  border: 1px solid var(--de-border-strong) !important;
+  border: 1.5px solid var(--de-border-strong) !important;
   border-radius: 6px !important;
+  overflow: hidden;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-bar-form:focus-within {
+  border-color: #f3a847 !important;
+  box-shadow: 0 0 0 2px rgba(243, 168, 71, 0.35) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-scope,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-dropdown-card,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #searchDropdownBox {
+html[data-darkext-active="true"][data-darkext-site="amazon"] #searchDropdownBox,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-label-id {
   background-color: var(--de-bg-subtle) !important;
   color: var(--de-text) !important;
-  border-right: 1px solid var(--de-border) !important;
+  border-right: 1px solid var(--de-border-strong) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-dropdown-card .nav-icon,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-scope .nav-icon {
+  filter: invert(0.9) brightness(1.15) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-field,
@@ -135,9 +154,26 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] #twotabsearchtextbo
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-submit,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-submit-button {
-  background-color: var(--de-accent) !important;
-  color: var(--de-accent-text) !important;
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-submit-text {
+  background-image: none !important;
+  background-color: #f3a847 !important;
+  border: none !important;
+  color: #111111 !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-submit:hover,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-submit-text:hover {
+  background-color: #febd69 !important;
+}
+
+/* Keep the transparent submit input overlay from hiding the magnifying glass sprite */
+html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-search-submit-button,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-search-submit .nav-input {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Nav flyouts & autocomplete suggestions */
@@ -148,12 +184,13 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-core-flyout,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-flyout,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-al-container,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-flyout-ewc,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #ewc-content,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .autocomplete-results-container,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-suggestion-container {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border-strong) !important;
+  border: 1px solid var(--de-border-strong) !important;
   color: var(--de-text) !important;
-  box-shadow: 0 8px 24px var(--de-shadow) !important;
+  box-shadow: var(--de-shadow) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-suggestion,
@@ -176,24 +213,46 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-breadcrumb li {
 }
 
 /* Search results, cards, boxes, and refinements */
+html[data-darkext-active="true"][data-darkext-site="amazon"] .s-result-item {
+  background-color: transparent !important;
+  color: var(--de-text) !important;
+}
+
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-box,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-box-inner,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui-header,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui-body,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui-footer,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .gw-card-layout .a-cardui {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .gw-card-layout .a-cardui,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .puis-card-container,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .puis-card-border,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-container,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-border,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel-card {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border: 1px solid var(--de-border-strong) !important;
+  border-radius: 8px;
   color: var(--de-text) !important;
+  box-shadow: var(--de-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.45)) !important;
 }
 
-html[data-darkext-active="true"][data-darkext-site="amazon"] .s-result-item,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-container,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-border {
-  background-color: var(--de-bg-elevated) !important;
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-box .a-box-inner,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui .a-cardui-header,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui .a-cardui-body,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui .a-cardui-footer {
   border-color: var(--de-border) !important;
-  color: var(--de-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .puis-card-container:hover,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-container:hover {
+  border-color: var(--de-accent) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .s-product-image-container {
+  background-color: var(--de-bg-subtle) !important;
+  border-radius: 6px;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-result-list-placeholder,
@@ -208,7 +267,7 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .sg-col-inner .s-bo
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-desktop-toolbar .a-section {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border-color: var(--de-border-strong) !important;
   color: var(--de-text) !important;
 }
 
@@ -235,8 +294,9 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] #aod-sticky-pinned-
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-accordion .a-accordion-row,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-accordion .a-accordion-inner {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border: 1px solid var(--de-border-strong) !important;
   color: var(--de-text) !important;
+  box-shadow: var(--de-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.45)) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-accordion .a-accordion-active .a-accordion-row {
@@ -260,7 +320,7 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-inner {
   background-image: none !important;
   background-color: var(--de-bg-subtle) !important;
-  border-color: var(--de-border-strong) !important;
+  border: 1px solid var(--de-border-strong) !important;
   color: var(--de-text) !important;
   box-shadow: none !important;
 }
@@ -273,10 +333,13 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-text {
   color: var(--de-text) !important;
 }
 
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-input {
+  background-color: transparent !important;
+  border: none !important;
+}
+
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-primary,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-primary .a-button-inner,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #add-to-cart-button,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-input[name*="add-to-cart"] {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-primary .a-button-inner {
   background-image: none !important;
   background-color: #ffd814 !important;
   border-color: #fcd200 !important;
@@ -293,12 +356,15 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-primary .
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-oneclick,
-html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-oneclick .a-button-inner,
-html[data-darkext-active="true"][data-darkext-site="amazon"] #buy-now-button {
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-oneclick .a-button-inner {
   background-image: none !important;
   background-color: #ffa41c !important;
   border-color: #ff8f00 !important;
   color: #0f1111 !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-oneclick:hover .a-button-inner {
+  background-color: #f08804 !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-button-oneclick .a-button-text {
@@ -370,8 +436,10 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] #sc-saved-cart,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #sc-buy-box,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .sc-list-item {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border: 1px solid var(--de-border-strong) !important;
+  border-radius: 8px;
   color: var(--de-text) !important;
+  box-shadow: var(--de-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.45)) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-meter {
@@ -400,7 +468,7 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .s-pagination-strip
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-pagination-item,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-pagination li a {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border-color: var(--de-border-strong) !important;
   color: var(--de-text) !important;
 }
 
@@ -435,7 +503,7 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .navFooterBackToTop
   color: var(--de-text) !important;
 }
 
-/* Protect product images, star sprites, Prime badges, and media */
+/* Protect product images, star sprites, Prime badges, and media; brighten monochrome UI icons */
 html[data-darkext-active="true"][data-darkext-site="amazon"] img,
 html[data-darkext-active="true"][data-darkext-site="amazon"] video {
   filter: none;
@@ -447,8 +515,19 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-star-small,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-star-medium,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-star-mini,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-prime,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .nav-cart-icon,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #nav-logo-sprites {
   filter: none !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-dropdown,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-close,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-next,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-previous,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-extender-expand,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-extender-collapse,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-icon-search {
+  filter: invert(0.88) brightness(1.15) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"][data-darkext-dim-images="true"] .s-image,

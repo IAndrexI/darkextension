@@ -84,20 +84,38 @@ html[data-darkext-active="true"][data-darkext-site="google-workspace"] .freebird
 html[data-darkext-active="true"][data-darkext-site="google-workspace"] .Qr7Oae,
 html[data-darkext-active="true"][data-darkext-site="google-workspace"] .geS5n {
   background-color: var(--de-bg-elevated) !important;
-  border-color: var(--de-border) !important;
+  border: 1px solid var(--de-border-strong) !important;
   color: var(--de-text) !important;
+  box-shadow: var(--de-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.4)) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="google-workspace"] a {
   color: var(--de-link) !important;
 }
 
-html[data-darkext-active="true"][data-darkext-site="google-workspace"] input,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] input:not([type="submit"]):not([type="button"]):not([type="reset"]),
 html[data-darkext-active="true"][data-darkext-site="google-workspace"] select,
 html[data-darkext-active="true"][data-darkext-site="google-workspace"] textarea {
   background-color: var(--de-bg-subtle) !important;
   border-color: var(--de-border-strong) !important;
   color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_hdr_tsb,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] button[type="submit"],
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] input[type="submit"],
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] button[aria-label*="Search" i] {
+  background-color: var(--de-accent) !important;
+  border: 1px solid var(--de-accent) !important;
+  color: var(--de-accent-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] #gs_hdr_tsb svg,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] button[type="submit"] svg,
+html[data-darkext-active="true"][data-darkext-site="google-workspace"] button[aria-label*="Search" i] svg {
+  color: var(--de-accent-text) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="google-workspace"] img,

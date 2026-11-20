@@ -199,6 +199,40 @@
     }
   }
 
+  function isCardLikeElement(el, style) {
+    if (!el || el.nodeType !== 1) return false;
+    const tag = (el.tagName || '').toUpperCase();
+    if (tag === 'BODY' || tag === 'HTML' || tag === 'MAIN') return false;
+    if (tag === 'ARTICLE') return true;
+    const role = el.getAttribute ? (el.getAttribute('role') || '').toLowerCase() : '';
+    if (role === 'dialog' || role === 'menu' || role === 'listbox') return true;
+    if (style && style.boxShadow && style.boxShadow !== 'none') return true;
+    if (style) {
+      for (const [, , widthProp, styleProp] of BORDER_PROPS) {
+        if (parseFloat(style[widthProp] || '0') > 0 && style[styleProp] && style[styleProp] !== 'none') {
+          return true;
+        }
+      }
+    }
+    const cls = typeof el.className === 'string' ? el.className : '';
+    return /\b(?:card|tile|panel|popover|modal|dropdown|buybox|item-card)\b/i.test(cls);
+  }
+
+  function isSearchOrSubmitButton(el) {
+    if (!el || el.nodeType !== 1) return false;
+    const tag = (el.tagName || '').toUpperCase();
+    const type = el.getAttribute ? (el.getAttribute('type') || '').toLowerCase() : '';
+    if ((tag === 'INPUT' || tag === 'BUTTON') && type === 'submit') return true;
+    const role = el.getAttribute ? (el.getAttribute('role') || '').toLowerCase() : '';
+    if (tag === 'BUTTON' || role === 'button') {
+      const ariaLabel = el.getAttribute ? (el.getAttribute('aria-label') || '') : '';
+      const title = el.getAttribute ? (el.getAttribute('title') || '') : '';
+      const cls = typeof el.className === 'string' ? el.className : '';
+      return /\bsearch\b/i.test(ariaLabel) || /\bsearch\b/i.test(title) || /\bsearch[-_]?(?:btn|button)\b/i.test(cls);
+    }
+    return false;
+  }
+
   function computeDarkeningPlan(el, style, presetColors, win, ColorUtils) {
     const plan = {};
     const hasBgUrlImage =
@@ -210,8 +244,16 @@
     const fg = ColorUtils.parseCssColor(style.color);
     const fgLum = fg && fg.a >= 0.1 ? ColorUtils.relativeLuminance(fg) : null;
 
+    const tag = (el.tagName || '').toUpperCase();
+    const role = el.getAttribute ? (el.getAttribute('role') || '').toLowerCase() : '';
+    const cardLike = isCardLikeElement(el, style);
+    const submitOrSearch = isSearchOrSubmitButton(el);
+    const isInputOrButton =
+      tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON' || role === 'button';
+
     let bgPreservedBright = false;
     let bgDarkened = false;
+    let accentAppliedToSubmit = false;
 
     if (!hasBgUrlImage && bg && bg.a >= 0.08) {
       const bgLum = ColorUtils.relativeLuminance(bg);
@@ -224,18 +266,42 @@
           if (lightFg) plan.color = lightFg;
         }
       } else if (bgLum !== null && bgLum > 0.24) {
-        const darkBg = ColorUtils.darkenBackgroundColor(bg, presetColors);
-        if (darkBg) {
-          plan.backgroundColor = darkBg;
+        if (submitOrSearch && presetColors.accent) {
+          plan.backgroundColor = presetColors.accent;
+          plan.color = presetColors.accentText || '#ffffff';
           bgDarkened = true;
+          accentAppliedToSubmit = true;
+        } else {
+          let darkBg = ColorUtils.darkenBackgroundColor(bg, presetColors);
+          if (
+            darkBg &&
+            cardLike &&
+            presetColors.elevated &&
+            darkBg.toLowerCase() === String(presetColors.bg || '').toLowerCase()
+          ) {
+            darkBg = presetColors.elevated;
+          }
+          if (darkBg) {
+            plan.backgroundColor = darkBg;
+            bgDarkened = true;
+          }
         }
-      } else if (bgLum !== null && bgLum <= 0.24 && bg.a >= 0.7 && fgLum !== null && fgLum < 0.2) {
+      } else if (bgLum !== null && bgLum <= 0.24 && bg.a >= 0.7 && fgLum !== null && fgLum < 0.2 && !submitOrSearch) {
         const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
         if (lightFg) plan.color = lightFg;
       }
     }
 
-    if (!hasBgUrlImage && !bgPreservedBright && fg && fg.a >= 0.1 && fgLum !== null && fgLum < 0.45) {
+    if (
+      !accentAppliedToSubmit &&
+      !submitOrSearch &&
+      !hasBgUrlImage &&
+      !bgPreservedBright &&
+      fg &&
+      fg.a >= 0.1 &&
+      fgLum !== null &&
+      fgLum < 0.45
+    ) {
       if (bgDarkened || !hasBrightVibrantAncestor(el, win, ColorUtils)) {
         const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
         if (lightFg) {
@@ -254,7 +320,13 @@
       if (!bColor || bColor.a < 0.1) continue;
       const bLum = ColorUtils.relativeLuminance(bColor);
       if (bLum !== null && bLum > 0.35 && !isVibrantBrandColor(bColor, ColorUtils)) {
-        plan[jsProp] = presetColors.border || '#2e3442';
+        if (accentAppliedToSubmit && presetColors.accent) {
+          plan[jsProp] = presetColors.accent;
+        } else if (cardLike || isInputOrButton) {
+          plan[jsProp] = presetColors.borderStrong || presetColors.border || '#4b566e';
+        } else {
+          plan[jsProp] = presetColors.border || '#363e50';
+        }
       }
     }
 
