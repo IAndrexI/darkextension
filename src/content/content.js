@@ -395,7 +395,7 @@
   }
 
   function handleSpaNavigation() {
-    if (lastAppliedState.active && lastAppliedState.mode === 'dynamic') {
+    if (lastAppliedState.active && (lastAppliedState.mode === 'dynamic' || lastAppliedState.mode === 'site-theme')) {
       if (typeof DynamicEngine.rescan === 'function') {
         DynamicEngine.rescan();
       }
@@ -483,7 +483,11 @@
       document.addEventListener('DOMContentLoaded', async () => {
         if (!nativeCheckDone) {
           await applyState({ refetch: false });
-        } else if (lastAppliedState.active && lastAppliedState.mode === 'dynamic' && typeof DynamicEngine.rescan === 'function') {
+        } else if (
+          lastAppliedState.active &&
+          (lastAppliedState.mode === 'dynamic' || lastAppliedState.mode === 'site-theme') &&
+          typeof DynamicEngine.rescan === 'function'
+        ) {
           DynamicEngine.rescan();
         }
       });

@@ -28,6 +28,14 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] h3,
 html[data-darkext-active="true"][data-darkext-site="amazon"] h4,
 html[data-darkext-active="true"][data-darkext-site="amazon"] h5,
 html[data-darkext-active="true"][data-darkext-site="amazon"] h6,
+html[data-darkext-active="true"][data-darkext-site="amazon"] p,
+html[data-darkext-active="true"][data-darkext-site="amazon"] li,
+html[data-darkext-active="true"][data-darkext-site="amazon"] dd,
+html[data-darkext-active="true"][data-darkext-site="amazon"] dt,
+html[data-darkext-active="true"][data-darkext-site="amazon"] label,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-list-item,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-text-normal,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-color-state,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-color-base,
 html[data-darkext-active="true"][data-darkext-site="amazon"] #productTitle,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .a-size-large,
@@ -248,6 +256,62 @@ html[data-darkext-active="true"][data-darkext-site="amazon"] .a-cardui .a-cardui
 html[data-darkext-active="true"][data-darkext-site="amazon"] .puis-card-container:hover,
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-card-container:hover {
   border-color: var(--de-accent) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-color-base-background,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-expander-content-fade {
+  background-color: var(--de-bg) !important;
+  background-image: none !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-color-offset-background,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-color-alternate-background,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-box-title,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-box-group > .a-box,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #rhf,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .rhf-frame,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .rhf-border,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #rhf-shoveler,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .feed-carousel-viewport,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-container,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-carousel-viewport,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .p13n-desktop-carousel,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #gw-card-layout,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .gw-card-layout,
+html[data-darkext-active="true"][data-darkext-site="amazon"] #desktop-banner,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-expander-content,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-expander-partial-collapse-header {
+  background-color: var(--de-bg-elevated) !important;
+  background-image: none !important;
+  border-color: var(--de-border-strong) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-alert-info .a-box-inner,
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-alert-inline-info {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-link) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-alert-warning .a-box-inner {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-warning) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-alert-success .a-box-inner {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-success) !important;
+  color: var(--de-text) !important;
+}
+
+html[data-darkext-active="true"][data-darkext-site="amazon"] .a-alert-error .a-box-inner {
+  background-color: var(--de-bg-subtle) !important;
+  border-color: var(--de-danger) !important;
+  color: var(--de-text) !important;
 }
 
 html[data-darkext-active="true"][data-darkext-site="amazon"] .s-product-image-container {

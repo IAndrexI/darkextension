@@ -490,7 +490,18 @@ describe('Site Themes Registry & CSS Audit', () => {
     }
 
     const amazonCss = fs.readFileSync(path.join(ROOT, 'src/themes/sites/amazon.css'), 'utf8');
-    for (const token of ['#navbar', '#dp', '.s-result-item', '#navFooter', '.puis-card-container', '#nav-cart-count']) {
+    for (const token of [
+      '#navbar',
+      '#dp',
+      '.s-result-item',
+      '#navFooter',
+      '.puis-card-container',
+      '#nav-cart-count',
+      '.a-color-offset-background',
+      '.a-box-title',
+      '.a-alert-info',
+      '#rhf',
+    ]) {
       assert.ok(amazonCss.includes(token), `amazon.css should style ${token}`);
     }
     assert.match(
@@ -500,7 +511,18 @@ describe('Site Themes Registry & CSS Audit', () => {
     );
 
     const ebayCss = fs.readFileSync(path.join(ROOT, 'src/themes/sites/ebay.css'), 'utf8');
-    for (const token of ['#gh', '.srp-results', '.s-item', '#glbfooter', '.s-item__wrapper', '.vl-card']) {
+    for (const token of [
+      '#gh',
+      '.srp-results',
+      '.s-item',
+      '#glbfooter',
+      '.s-item__wrapper',
+      '.vl-card',
+      '--color-background-primary',
+      '--color-background-secondary',
+      '--color-foreground-primary',
+      '--color-neutral-1',
+    ]) {
       assert.ok(ebayCss.includes(token), `ebay.css should style ${token}`);
     }
     assert.ok(
@@ -510,6 +532,17 @@ describe('Site Themes Registry & CSS Audit', () => {
     const btnIdx = ebayCss.indexOf('[data-darkext-site="ebay"] .btn,');
     const searchBtnIdx = ebayCss.indexOf('#gh-search-btn');
     assert.ok(btnIdx !== -1 && searchBtnIdx > btnIdx, 'ebay.css must define #gh-search-btn after generic .btn');
+
+    const dynamicEngineSrc = fs.readFileSync(path.join(ROOT, 'src/content/dynamic-engine.js'), 'utf8');
+    for (const token of [
+      "'site-theme'",
+      "'background-image'",
+      "'important'",
+      'nav-search-submit-button',
+      'a-button-input',
+    ]) {
+      assert.ok(dynamicEngineSrc.includes(token), `dynamic-engine.js must include ${token}`);
+    }
   });
 });
 

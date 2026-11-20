@@ -276,6 +276,30 @@ describe('ColorUtils (src/shared/color-utils.js)', () => {
     const parsedLight = ColorUtils.parseCssColor(lightTextStr);
     assert.ok(parsedLight, `lightenTextColor returned unparseable color: ${lightTextStr}`);
     assert.ok(ColorUtils.relativeLuminance(parsedLight) > 0.45, 'Lightened dark text should have high luminance');
+
+    // White-gray and mid-gray surfaces must darken deeply (< 0.06 luminance) for crisp white text contrast
+    for (const grayHex of ['#f0f2f2', '#e3e6e6', '#cccccc', '#888888', '#767676']) {
+      const darkened = ColorUtils.darkenBackgroundColor(grayHex);
+      const parsed = ColorUtils.parseCssColor(darkened);
+      assert.ok(parsed, `Expected valid darkened color for ${grayHex}`);
+      const lum = ColorUtils.relativeLuminance(parsed);
+      assert.ok(
+        lum !== null && lum < 0.06,
+        `Expected ${grayHex} -> ${darkened} to have luminance < 0.06, got ${lum}`
+      );
+    }
+
+    // Dark and mid-gray text must lift to high luminance (>= 0.55)
+    for (const textHex of ['#111111', '#555555', '#767676', '#888888']) {
+      const lightened = ColorUtils.lightenTextColor(textHex);
+      const parsed = ColorUtils.parseCssColor(lightened);
+      assert.ok(parsed, `Expected valid lightened text color for ${textHex}`);
+      const lum = ColorUtils.relativeLuminance(parsed);
+      assert.ok(
+        lum !== null && lum >= 0.55,
+        `Expected ${textHex} -> ${lightened} to have luminance >= 0.55, got ${lum}`
+      );
+    }
   });
 });
 

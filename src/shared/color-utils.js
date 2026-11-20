@@ -344,7 +344,7 @@
     if (parsed.a < 0.05) {
       return formatCssColor(parsed.r, parsed.g, parsed.b, parsed.a);
     }
-    if (isDarkColor(parsed, 0.22)) {
+    if (isDarkColor(parsed, 0.12)) {
       return formatCssColor(parsed.r, parsed.g, parsed.b, parsed.a);
     }
 
@@ -352,21 +352,20 @@
     const baseHsl = rgbToHsl(baseTarget.r, baseTarget.g, baseTarget.b);
     const hsl = rgbToHsl(parsed.r, parsed.g, parsed.b);
 
-    // Pure/near-white or neutral light grey surfaces snap smoothly to dark theme surfaces
+    // Pure white snaps to base bg; all white-gray / light-gray / mid-gray surfaces darken deeply
     if (hsl.s <= 14) {
-      if (hsl.l >= 94) {
+      if (hsl.l >= 96) {
         return formatCssColor(baseTarget.r, baseTarget.g, baseTarget.b, parsed.a);
       }
-      // Map light neutral greys (l: 45..94) into elevated dark surfaces (l: baseL+2 .. baseL+12)
-      const invertedRatio = clamp((100 - hsl.l) / 55, 0, 1);
-      const targetL = clamp(baseHsl.l + invertedRatio * 12, baseHsl.l, 22);
+      const invertedRatio = clamp((96 - hsl.l) / 64, 0, 1);
+      const targetL = clamp(baseHsl.l + 3 + invertedRatio * 6, baseHsl.l + 3, 18);
       const rgb = hslToRgb(baseHsl.h, baseHsl.s, targetL);
       return formatCssColor(rgb.r, rgb.g, rgb.b, parsed.a);
     }
 
-    // Tinted / colored light backgrounds preserve hue while shifting to rich dark surface
-    const darkS = clamp(hsl.s * 0.65, 14, 52);
-    const darkL = clamp(baseHsl.l + 6 + (100 - hsl.l) * 0.14, 10, 24);
+    // Tinted / colored light and medium backgrounds preserve subtle hue on a deep dark surface
+    const darkS = clamp(hsl.s * 0.55, 12, 46);
+    const darkL = clamp(baseHsl.l + 4 + (100 - hsl.l) * 0.08, 10, 19);
     const rgb = hslToRgb(hsl.h, darkS, darkL);
     return formatCssColor(rgb.r, rgb.g, rgb.b, parsed.a);
   }
@@ -380,28 +379,28 @@
       return formatCssColor(parsed.r, parsed.g, parsed.b, parsed.a);
     }
     const lum = relativeLuminance(parsed);
-    if (lum !== null && lum >= 0.45) {
+    if (lum !== null && lum >= 0.55) {
       return formatCssColor(parsed.r, parsed.g, parsed.b, parsed.a);
     }
 
-    const textTarget = resolvePresetTarget(presetColors, 'text', '#e6e9ef');
+    const textTarget = resolvePresetTarget(presetColors, 'text', '#f4f6fa');
     const targetHsl = rgbToHsl(textTarget.r, textTarget.g, textTarget.b);
     const hsl = rgbToHsl(parsed.r, parsed.g, parsed.b);
 
-    // Neutral dark text (#000 .. #666) maps to readable preset text / secondary text
-    if (hsl.s <= 16) {
-      if (hsl.l <= 18) {
+    // Neutral dark and mid-gray text (#000 .. #aaa) maps to crisp white / high-contrast silver
+    if (hsl.s <= 18) {
+      if (hsl.l <= 32) {
         return formatCssColor(textTarget.r, textTarget.g, textTarget.b, parsed.a);
       }
-      const mutedRatio = clamp((hsl.l - 18) / 45, 0, 1);
-      const lightL = clamp(targetHsl.l - mutedRatio * 14, 72, 94);
+      const mutedRatio = clamp((hsl.l - 32) / 50, 0, 1);
+      const lightL = clamp(targetHsl.l - mutedRatio * 12, 80, 96);
       const rgb = hslToRgb(targetHsl.h, targetHsl.s, lightL);
       return formatCssColor(rgb.r, rgb.g, rgb.b, parsed.a);
     }
 
     // Colored dark text (links, accents, badges) stays recognizable at high contrast
     const lightS = clamp(Math.max(hsl.s, 45), 40, 88);
-    const lightL = clamp(72 + (100 - hsl.l) * 0.08, 68, 84);
+    const lightL = clamp(74 + (100 - hsl.l) * 0.08, 72, 86);
     const rgb = hslToRgb(hsl.h, lightS, lightL);
     return formatCssColor(rgb.r, rgb.g, rgb.b, parsed.a);
   }

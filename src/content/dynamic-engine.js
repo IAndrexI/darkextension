@@ -44,6 +44,7 @@
 
   const trackedProps = [
     ['backgroundColor', 'background-color'],
+    ['backgroundImage', 'background-image'],
     ['color', 'color'],
     ['borderTopColor', 'border-top-color'],
     ['borderRightColor', 'border-right-color'],
@@ -85,18 +86,24 @@
     return DarkExt.ColorUtils || null;
   }
 
+  function isSweepMode(mode) {
+    return mode === 'dynamic' || mode === 'site-theme';
+  }
+
   function getPresetColors(presetId) {
     const Constants = getConstants();
     const presets = Constants.THEME_PRESETS || {};
     return presets[presetId] || presets.midnight || {
       bg: '#121418',
-      elevated: '#1a1d24',
-      subtle: '#222630',
-      border: '#2e3442',
-      text: '#e6e9ef',
-      secondary: '#a8b0c0',
-      link: '#7ab3ff',
-      accent: '#6c8cff'
+      elevated: '#1b1f29',
+      subtle: '#242a38',
+      border: '#384156',
+      borderStrong: '#505d7a',
+      text: '#f4f6fa',
+      secondary: '#c4ccd9',
+      link: '#82b8ff',
+      accent: '#4f78ff',
+      accentText: '#ffffff'
     };
   }
 
@@ -233,14 +240,106 @@
     return false;
   }
 
-  function computeDarkeningPlan(el, style, presetColors, win, ColorUtils) {
+  function isTransparentOverlayInput(el, style) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.id === 'nav-search-submit-button') return true;
+    if (el.classList && el.classList.contains('a-button-input')) return true;
+    const tag = (el.tagName || '').toUpperCase();
+    if (tag === 'INPUT' && style && parseFloat(style.opacity || '1') < 0.12) {
+      return true;
+    }
+    return false;
+  }
+
+  function hasLightCssGradient(style, ColorUtils) {
+    const bgImg = style && style.backgroundImage;
+    if (!bgImg || bgImg === 'none') return false;
+    const lower = bgImg.toLowerCase();
+    if (lower.includes('url(') || !lower.includes('gradient(')) {
+      return false;
+    }
+    const tokens = bgImg.match(
+      /rgba?\([^)]+\)|hsla?\([^)]+\)|#[0-9a-f]{3,8}\b|\b(?:white|snow|ivory|whitesmoke|gainsboro|lightgrey|lightgray|silver|aliceblue|ghostwhite|seashell|beige|linen)\b/gi
+    );
+    if (!tokens || tokens.length === 0) {
+      return true;
+    }
+    let sawParseable = false;
+    for (const token of tokens) {
+      const lowerTok = token.toLowerCase();
+      if (
+        lowerTok === 'white' ||
+        lowerTok === 'snow' ||
+        lowerTok === 'ivory' ||
+        lowerTok === 'whitesmoke' ||
+        lowerTok === 'gainsboro' ||
+        lowerTok === 'lightgrey' ||
+        lowerTok === 'lightgray' ||
+        lowerTok === 'silver' ||
+        lowerTok === 'aliceblue' ||
+        lowerTok === 'ghostwhite' ||
+        lowerTok === 'seashell' ||
+        lowerTok === 'beige' ||
+        lowerTok === 'linen'
+      ) {
+        return true;
+      }
+      const parsed = ColorUtils.parseCssColor(token);
+      if (!parsed || parsed.a < 0.08) continue;
+      sawParseable = true;
+      const lum = ColorUtils.relativeLuminance(parsed);
+      if (lum !== null && lum > 0.2 && !isVibrantBrandColor(parsed, ColorUtils)) {
+        return true;
+      }
+    }
+    return !sawParseable;
+  }
+
+  function getAncestorBackgroundInfo(startEl, win, ColorUtils) {
+    if (!startEl || !win || typeof win.getComputedStyle !== 'function' || !ColorUtils) {
+      return { lum: 0.02, isVibrant: false, hasUrlBg: false };
+    }
+    let cur = startEl;
+    for (let depth = 0; depth < 6 && cur; depth += 1) {
+      try {
+        const st = win.getComputedStyle(cur);
+        if (st) {
+          const bgImg = st.backgroundImage || '';
+          if (bgImg && bgImg !== 'none' && bgImg.toLowerCase().includes('url(')) {
+            return { lum: 0.25, isVibrant: false, hasUrlBg: true };
+          }
+          const c = ColorUtils.parseCssColor(st.backgroundColor);
+          if (c && c.a >= 0.25) {
+            const lum = ColorUtils.relativeLuminance(c);
+            return {
+              lum: lum === null ? 0.02 : lum,
+              isVibrant: isVibrantBrandColor(c, ColorUtils),
+              hasUrlBg: false
+            };
+          }
+        }
+      } catch (_) {
+        break;
+      }
+      cur = cur.parentElement;
+    }
+    return { lum: 0.02, isVibrant: false, hasUrlBg: false };
+  }
+
+  function computeDarkeningPlan(el, style, presetColors, win, ColorUtils, options) {
+    if (isTransparentOverlayInput(el, style)) {
+      return {};
+    }
+
     const plan = {};
+    const isSiteThemeSweep = Boolean(options && options.siteThemeSweep);
     const hasBgUrlImage =
       Boolean(style.backgroundImage) &&
       style.backgroundImage !== 'none' &&
       style.backgroundImage.toLowerCase().includes('url(');
 
     const bg = ColorUtils.parseCssColor(style.backgroundColor);
+    const bgLum = bg && bg.a >= 0.08 ? ColorUtils.relativeLuminance(bg) : null;
     const fg = ColorUtils.parseCssColor(style.color);
     const fgLum = fg && fg.a >= 0.1 ? ColorUtils.relativeLuminance(fg) : null;
 
@@ -255,23 +354,39 @@
     let bgDarkened = false;
     let accentAppliedToSubmit = false;
 
-    if (!hasBgUrlImage && bg && bg.a >= 0.08) {
-      const bgLum = ColorUtils.relativeLuminance(bg);
+    const hasSelfVibrantBg = Boolean(bg && bg.a >= 0.2 && isVibrantBrandColor(bg, ColorUtils));
+    const lightGradient = !hasBgUrlImage && !hasSelfVibrantBg && hasLightCssGradient(style, ColorUtils);
+
+    if (lightGradient) {
+      plan.backgroundImage = 'none';
+      if (submitOrSearch && !isSiteThemeSweep && presetColors.accent) {
+        plan.backgroundColor = presetColors.accent;
+        plan.color = presetColors.accentText || '#ffffff';
+        accentAppliedToSubmit = true;
+      } else {
+        plan.backgroundColor = cardLike
+          ? (presetColors.elevated || '#1b1f29')
+          : (presetColors.bg || '#121418');
+      }
+      bgDarkened = true;
+    }
+
+    if (!bgDarkened && !hasBgUrlImage && bg && bg.a >= 0.08) {
       if (isVibrantBrandColor(bg, ColorUtils)) {
         // Preserve brand/CTA element color; ensure text contrast stays readable
         if (bgLum !== null && bgLum > 0.35) {
           bgPreservedBright = true;
-        } else if (bgLum !== null && bgLum <= 0.25 && fgLum !== null && fgLum < 0.25) {
+        } else if (bgLum !== null && bgLum <= 0.25 && fgLum !== null && fgLum < 0.35) {
           const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
           if (lightFg) plan.color = lightFg;
         }
-      } else if (bgLum !== null && bgLum > 0.24) {
-        if (submitOrSearch && presetColors.accent) {
+      } else if (bgLum !== null && bgLum > 0.13) {
+        if (submitOrSearch && !isSiteThemeSweep && presetColors.accent) {
           plan.backgroundColor = presetColors.accent;
           plan.color = presetColors.accentText || '#ffffff';
           bgDarkened = true;
           accentAppliedToSubmit = true;
-        } else {
+        } else if (!(isSiteThemeSweep && submitOrSearch)) {
           let darkBg = ColorUtils.darkenBackgroundColor(bg, presetColors);
           if (
             darkBg &&
@@ -286,27 +401,46 @@
             bgDarkened = true;
           }
         }
-      } else if (bgLum !== null && bgLum <= 0.24 && bg.a >= 0.7 && fgLum !== null && fgLum < 0.2 && !submitOrSearch) {
+      } else if (bgLum !== null && bgLum <= 0.13 && bg.a >= 0.7 && fgLum !== null && fgLum < 0.35 && !submitOrSearch) {
         const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
         if (lightFg) plan.color = lightFg;
       }
     }
 
+    let effectiveBg;
+    if (bgDarkened) {
+      effectiveBg = { lum: 0.02, isVibrant: false, hasUrlBg: false };
+    } else if (!hasBgUrlImage && bg && bg.a >= 0.25) {
+      effectiveBg = {
+        lum: bgLum === null ? 0.02 : bgLum,
+        isVibrant: hasSelfVibrantBg,
+        hasUrlBg: false
+      };
+    } else {
+      effectiveBg = getAncestorBackgroundInfo(el.parentElement, win, ColorUtils);
+    }
+
     if (
       !accentAppliedToSubmit &&
-      !submitOrSearch &&
-      !hasBgUrlImage &&
       !bgPreservedBright &&
-      fg &&
-      fg.a >= 0.1 &&
-      fgLum !== null &&
-      fgLum < 0.45
+      !effectiveBg.hasUrlBg &&
+      !(effectiveBg.isVibrant && effectiveBg.lum > 0.35)
     ) {
-      if (bgDarkened || !hasBrightVibrantAncestor(el, win, ColorUtils)) {
-        const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
-        if (lightFg) {
-          plan.color = lightFg;
+      if (fg && fg.a >= 0.1 && fgLum !== null && fgLum < 0.55 && !(isSiteThemeSweep && submitOrSearch)) {
+        if (bgDarkened || effectiveBg.lum < 0.22 || !hasBrightVibrantAncestor(el, win, ColorUtils)) {
+          const lightFg = ColorUtils.lightenTextColor(fg, presetColors);
+          if (lightFg) {
+            plan.color = lightFg;
+          }
         }
+      }
+    } else if (
+      !accentAppliedToSubmit &&
+      !effectiveBg.hasUrlBg &&
+      (bgPreservedBright || (effectiveBg.isVibrant && effectiveBg.lum > 0.42))
+    ) {
+      if (fg && fg.a >= 0.1 && fgLum !== null && fgLum > 0.58) {
+        plan.color = '#0f1111';
       }
     }
 
@@ -323,9 +457,9 @@
         if (accentAppliedToSubmit && presetColors.accent) {
           plan[jsProp] = presetColors.accent;
         } else if (cardLike || isInputOrButton) {
-          plan[jsProp] = presetColors.borderStrong || presetColors.border || '#4b566e';
+          plan[jsProp] = presetColors.borderStrong || presetColors.border || '#505d7a';
         } else {
-          plan[jsProp] = presetColors.border || '#363e50';
+          plan[jsProp] = presetColors.border || '#384156';
         }
       }
     }
@@ -345,8 +479,7 @@
     for (const [jsProp, cssProp] of trackedProps) {
       if (Object.prototype.hasOwnProperty.call(plan, jsProp)) {
         const nextVal = plan[jsProp];
-        const useImportant = el.style.getPropertyPriority(cssProp) === 'important';
-        el.style.setProperty(cssProp, nextVal, useImportant ? 'important' : '');
+        el.style.setProperty(cssProp, nextVal, 'important');
         applied[jsProp] = el.style[jsProp];
       }
     }
@@ -430,7 +563,7 @@
   }
 
   function scheduleBatchProcessing() {
-    if (!active || !currentConfig || currentConfig.mode !== 'dynamic') {
+    if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
       return;
     }
     if (rafId !== null || pendingQueue.length === 0) {
@@ -444,7 +577,7 @@
 
   function processBatch() {
     rafId = null;
-    if (!active || !currentConfig || currentConfig.mode !== 'dynamic') {
+    if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
       pendingQueue.length = 0;
       return;
     }
@@ -457,6 +590,7 @@
     }
 
     const presetColors = getPresetColors(currentConfig.preset);
+    const planOptions = { siteThemeSweep: currentConfig.mode === 'site-theme' };
     const batch = [];
 
     while (batch.length < BATCH_SIZE && pendingQueue.length > 0) {
@@ -482,7 +616,7 @@
         continue;
       }
       if (!computed) continue;
-      const plan = computeDarkeningPlan(el, computed, presetColors, win, ColorUtils);
+      const plan = computeDarkeningPlan(el, computed, presetColors, win, ColorUtils, planOptions);
       if (Object.keys(plan).length > 0) {
         writes.push([el, plan]);
       }
@@ -512,7 +646,7 @@
   }
 
   function handleMutations(records) {
-    if (!active || !currentConfig || currentConfig.mode !== 'dynamic') {
+    if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
       return;
     }
 
@@ -557,7 +691,7 @@
 
   function flushMutationBuffer() {
     mutationDebounceTimer = null;
-    if (!active || !currentConfig || currentConfig.mode !== 'dynamic') {
+    if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
       mutationBuffer.clear();
       return;
     }
@@ -611,7 +745,7 @@
     if (currentConfig && typeof currentConfig.onNavigate === 'function') {
       currentConfig.onNavigate(lastKnownUrl);
     }
-    if (currentConfig && currentConfig.mode === 'dynamic' && typeof document !== 'undefined' && document.body) {
+    if (currentConfig && isSweepMode(currentConfig.mode) && typeof document !== 'undefined' && document.body) {
       enqueueSubtree(document.body);
       scheduleBatchProcessing();
     }
@@ -835,8 +969,8 @@
     const previousMode = currentConfig ? currentConfig.mode : null;
     const previousPreset = currentConfig ? currentConfig.preset : null;
 
-    // Cleanly reset inline dynamic styles when leaving dynamic mode or changing preset
-    if (previousMode === 'dynamic' && (config.mode !== 'dynamic' || previousPreset !== config.preset)) {
+    // Cleanly reset inline styles when changing sweep/non-sweep mode or preset
+    if (isSweepMode(previousMode) && (config.mode !== previousMode || previousPreset !== config.preset)) {
       if (rafId !== null) {
         if (typeof cancelAnimationFrame === 'function') {
           cancelAnimationFrame(rafId);
@@ -858,7 +992,7 @@
     updateCustomCss(currentConfig.customCss || '');
     installSpaHooks();
 
-    if (currentConfig.mode === 'dynamic') {
+    if (isSweepMode(currentConfig.mode)) {
       startMutationObserver();
       if (typeof document !== 'undefined' && document.documentElement) {
         enqueueSubtree(document.documentElement);
@@ -975,7 +1109,7 @@
   }
 
   function rescan() {
-    if (!active || !currentConfig || currentConfig.mode !== 'dynamic') {
+    if (!active || !currentConfig || !isSweepMode(currentConfig.mode)) {
       return;
     }
     if (typeof document !== 'undefined' && document.documentElement) {
@@ -987,7 +1121,7 @@
   function pauseForDetection() {
     if (typeof document === 'undefined' || !document.documentElement) return;
     document.documentElement.removeAttribute('data-darkext-active');
-    if (currentConfig && currentConfig.mode === 'dynamic') {
+    if (currentConfig && isSweepMode(currentConfig.mode)) {
       if (rafId !== null) {
         if (typeof cancelAnimationFrame === 'function') {
           cancelAnimationFrame(rafId);
