@@ -275,10 +275,20 @@
     let skippedNativeDark = false;
 
     const siteDisabled = Boolean(siteRule && (siteRule.enabled === false || siteRule.mode === 'off'));
+    const nativeDarkDetected = Boolean(opts.nativeDarkDetected);
+    const shouldSkipNative =
+      Boolean(cfg.autoDetectNativeDark) &&
+      nativeDarkDetected &&
+      !forceOverrideNativeDark &&
+      requestedMode !== 'site-theme';
 
     if (!cfg.enabled || scheduleBlocked || siteDisabled || requestedMode === 'off') {
       active = false;
       mode = 'off';
+    } else if (shouldSkipNative) {
+      active = false;
+      mode = 'off';
+      skippedNativeDark = true;
     } else if ((requestedMode === 'auto' || requestedMode === 'site-theme') && matchedTheme) {
       active = true;
       mode = 'site-theme';
@@ -286,16 +296,8 @@
       appliedThemeName = matchedTheme.name || matchedTheme.id;
       appliedTheme = matchedTheme;
     } else {
-      const nativeDarkDetected = Boolean(opts.nativeDarkDetected);
-      const shouldSkipNative = Boolean(cfg.autoDetectNativeDark) && nativeDarkDetected && !forceOverrideNativeDark;
-      const fallbackMode = requestedMode === 'filter' ? 'filter' : 'dynamic';
-      mode = fallbackMode;
-      if (shouldSkipNative) {
-        active = false;
-        skippedNativeDark = true;
-      } else {
-        active = true;
-      }
+      active = true;
+      mode = requestedMode === 'filter' ? 'filter' : 'dynamic';
     }
 
     return {

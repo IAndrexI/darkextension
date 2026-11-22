@@ -1629,4 +1629,124 @@ describe('Startup, Broadcast & CSS Performance Audits', () => {
     assertSearchInputDebounced('themeSearch', 'renderThemesSection');
     assertSearchInputDebounced('rulesSearch', 'renderSiteRulesSection');
   });
+
+  it('native-dark-enforcer.js and detector.js activate built-in website dark mode and avoid overriding native dark sites', () => {
+    const enforcerCode = readRepoFile('src/content/native-dark-enforcer.js');
+    const enforcerListeners = [];
+    const enforcerWin = {
+      matchMedia(query) {
+        const isLight = /prefers-color-scheme\s*:\s*light/i.test(query);
+        return {
+          media: query,
+          matches: isLight,
+          addEventListener() {},
+          removeEventListener() {},
+        };
+      },
+      addEventListener(type, fn) {
+        if (type === '__darkext_native_dark_pref') {
+          enforcerListeners.push(fn);
+        }
+      },
+    };
+    const enforcerSandbox = {
+      window: enforcerWin,
+      globalThis: null,
+    };
+    enforcerSandbox.globalThis = enforcerSandbox;
+    const enforcerCtx = vm.createContext(enforcerSandbox);
+    vm.runInContext(enforcerCode, enforcerCtx, {
+      filename: path.join(ROOT, 'src/content/native-dark-enforcer.js'),
+    });
+
+    const darkMql = enforcerWin.matchMedia('(prefers-color-scheme: dark)');
+    const lightMql = enforcerWin.matchMedia('(prefers-color-scheme: light)');
+    const widthMql = enforcerWin.matchMedia('(max-width: 600px)');
+    assert.equal(darkMql.matches, true, 'Enforcer must report prefers-color-scheme: dark as true');
+    assert.equal(lightMql.matches, false, 'Enforcer must report prefers-color-scheme: light as false');
+    assert.equal(widthMql.matches, false, 'Unrelated media queries must pass through untouched');
+
+    let darkChangeEvents = 0;
+    darkMql.addEventListener('change', () => {
+      darkChangeEvents += 1;
+    });
+    for (const fn of enforcerListeners) {
+      fn({ detail: { enabled: false } });
+    }
+    assert.equal(darkMql.matches, false, 'Disabling enforcer must restore underlying OS light preference');
+    assert.equal(lightMql.matches, true);
+    assert.equal(darkChangeEvents, 1, 'Toggling enforcer must notify registered MediaQueryList listeners');
+
+    // Detector built-in activation & detection tests
+    const { ColorUtils } = loadFreshSharedModules();
+    const dom = createMockDomHarness();
+    const detectorSandbox = {
+      console,
+      document: dom.doc,
+      window: dom.win,
+      DarkExt: { ColorUtils },
+      globalThis: null,
+    };
+    detectorSandbox.globalThis = detectorSandbox;
+    const detectorCtx = vm.createContext(detectorSandbox);
+    vm.runInContext(readRepoFile('src/content/detector.js'), detectorCtx, {
+      filename: path.join(ROOT, 'src/content/detector.js'),
+    });
+    const Detector = detectorCtx.DarkExt.Detector;
+
+    // 1. Plain light site (e.g. Amazon/eBay) has no built-in dark mode
+    assert.equal(Detector.activateNativeDarkIfAvailable(dom.doc).activated, false);
+    assert.equal(Detector.detectNativeDarkMode(dom.doc).isNativeDark, false);
+
+    // 2. Wikipedia Vector 2022 skin-theme-clientpref-day -> skin-theme-clientpref-night
+    dom.html.classList.add('skin-theme-clientpref-day');
+    dom.body._computed.backgroundColor = 'rgb(16, 20, 24)';
+    dom.body._computed.color = 'rgb(248, 249, 250)';
+    const wikiAct = Detector.activateNativeDarkIfAvailable(dom.doc);
+    assert.equal(wikiAct.activated, true);
+    assert.equal(dom.html.classList.contains('skin-theme-clientpref-night'), true);
+    assert.equal(Detector.detectNativeDarkMode(dom.doc).isNativeDark, true);
+    Detector.restoreNativeDarkActivation(dom.doc);
+    assert.equal(dom.html.classList.contains('skin-theme-clientpref-day'), true);
+    assert.equal(dom.html.classList.contains('skin-theme-clientpref-night'), false);
+    dom.html.classList.remove('skin-theme-clientpref-day');
+
+    // 3. GitHub Primer data-color-mode="light" + data-dark-theme="dark"
+    dom.html.setAttribute('data-color-mode', 'light');
+    dom.html.setAttribute('data-dark-theme', 'dark');
+    const ghAct = Detector.activateNativeDarkIfAvailable(dom.doc);
+    assert.equal(ghAct.activated, true);
+    assert.equal(dom.html.getAttribute('data-color-mode'), 'dark');
+    assert.equal(Detector.detectNativeDarkMode(dom.doc).isNativeDark, true);
+    Detector.restoreNativeDarkActivation(dom.doc);
+    assert.equal(dom.html.getAttribute('data-color-mode'), 'light');
+    dom.html.removeAttribute('data-color-mode');
+    dom.html.removeAttribute('data-dark-theme');
+
+    // 4. YouTube boolean dark attribute (<html dark="">)
+    dom.html.setAttribute('dark', '');
+    assert.equal(Detector.detectNativeDarkMode(dom.doc).isNativeDark, true);
+    dom.html.removeAttribute('dark');
+
+    // 5. Accessible CSS @media (prefers-color-scheme: dark) bridge when OS is light
+    dom.doc.styleSheets = [
+      {
+        ownerNode: { id: 'site-sheet', hasAttribute: () => false },
+        cssRules: [
+          {
+            type: 4,
+            conditionText: '(prefers-color-scheme: dark)',
+            cssRules: [{ cssText: 'body { background-color: rgb(18, 18, 18); color: rgb(240, 240, 240); }' }],
+          },
+        ],
+      },
+    ];
+    const mediaAct = Detector.activateNativeDarkIfAvailable(dom.doc);
+    assert.equal(mediaAct.activated, true);
+    const bridgeEl = dom.doc.getElementById('darkext-native-media-bridge');
+    assert.ok(bridgeEl, 'Detector must inject #darkext-native-media-bridge for @media (prefers-color-scheme: dark)');
+    assert.ok(bridgeEl.textContent.includes('rgb(18, 18, 18)'));
+    Detector.restoreNativeDarkActivation(dom.doc);
+    assert.equal(dom.doc.getElementById('darkext-native-media-bridge'), null);
+  });
 });

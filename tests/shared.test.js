@@ -204,6 +204,27 @@ describe('SiteMatcher (src/shared/site-matcher.js)', () => {
     assert.equal(skippedNative.active, false);
     assert.equal(skippedNative.skippedNativeDark, true);
 
+    // Even a curated site-theme domain is skipped in auto mode when native dark mode is already active
+    const wikiNativeSkipped = SiteMatcher.resolveEffectiveSiteConfig('en.wikipedia.org', baseSettings, registry, {
+      nativeDarkDetected: true,
+    });
+    assert.equal(wikiNativeSkipped.active, false);
+    assert.equal(wikiNativeSkipped.mode, 'off');
+    assert.equal(wikiNativeSkipped.skippedNativeDark, true);
+
+    const wikiForcedOverride = SiteMatcher.resolveEffectiveSiteConfig(
+      'en.wikipedia.org',
+      {
+        ...baseSettings,
+        siteRules: { 'en.wikipedia.org': { enabled: true, mode: 'auto', forceOverrideNativeDark: true } },
+      },
+      registry,
+      { nativeDarkDetected: true }
+    );
+    assert.equal(wikiForcedOverride.active, true);
+    assert.equal(wikiForcedOverride.mode, 'site-theme');
+    assert.equal(wikiForcedOverride.skippedNativeDark, false);
+
     const forcedNative = SiteMatcher.resolveEffectiveSiteConfig(
       'example.com',
       {

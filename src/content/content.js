@@ -63,6 +63,23 @@
     }
   }
 
+  function syncNativeEnforcerPref(enabled) {
+    try {
+      if (typeof sessionStorage !== 'undefined' && sessionStorage) {
+        sessionStorage.setItem('__darkext_native_enforcer', enabled ? '1' : '0');
+      }
+    } catch (_) {
+      // Ignore Storage/SecurityError on restricted origins
+    }
+    try {
+      if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function' && typeof CustomEvent === 'function') {
+        window.dispatchEvent(new CustomEvent('__darkext_native_dark_pref', { detail: { enabled: Boolean(enabled) } }));
+      }
+    } catch (_) {
+      // Ignore dispatch errors
+    }
+  }
+
   function updateShieldHint(isActive, presetId) {
     try {
       if (typeof sessionStorage === 'undefined' || !sessionStorage) {
@@ -378,15 +395,27 @@
     let nativeDarkDetected = false;
     const needsNativeCheck =
       preResolved.active &&
-      preResolved.mode !== 'site-theme' &&
+      preResolved.requestedMode !== 'site-theme' &&
       Boolean(currentSettings.autoDetectNativeDark) &&
       !preResolved.forceOverrideNativeDark;
 
-    if (needsNativeCheck) {
+    syncNativeEnforcerPref(needsNativeCheck);
+
+    if (!needsNativeCheck) {
+      if (typeof Detector.restoreNativeDarkActivation === 'function' && typeof document !== 'undefined') {
+        Detector.restoreNativeDarkActivation(document);
+      }
+    } else {
+      if (typeof Detector.activateNativeDarkIfAvailable === 'function' && typeof document !== 'undefined') {
+        Detector.activateNativeDarkIfAvailable(document);
+      }
       if (typeof document !== 'undefined' && document.readyState !== 'loading') {
         const detection = detectNativeDarkCleanly();
         nativeDarkDetected = Boolean(detection && detection.isNativeDark);
         nativeCheckDone = true;
+        if (!nativeDarkDetected && typeof Detector.restoreNativeDarkActivation === 'function') {
+          Detector.restoreNativeDarkActivation(document);
+        }
       } else {
         // At document_start, only skip early if meta/root attrs already clearly signal native dark
         const earlyDetection = detectNativeDarkCleanly();
@@ -567,6 +596,48 @@
         ) {
           DynamicEngine.rescan();
         }
+      });
+    }
+
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener(
+        'load',
+        async () => {
+          if (lastAppliedState.active && !lastAppliedState.nativeDarkDetected && !applyInFlight) {
+            await applyState({ refetch: false });
+          }
+        },
+        { once: true }
+      );
+    }
+
+    if (typeof document !== 'undefined' && document.documentElement && typeof MutationObserver === 'function') {
+      const nativeAttrObserver = new MutationObserver((records) => {
+        if (!lastAppliedState.active || lastAppliedState.nativeDarkDetected || applyInFlight) {
+          return;
+        }
+        if (!currentSettings || !currentSettings.autoDetectNativeDark) {
+          return;
+        }
+        for (const rec of records) {
+          if (rec.attributeName && !rec.attributeName.startsWith('data-darkext-')) {
+            void applyState({ refetch: false });
+            return;
+          }
+        }
+      });
+      nativeAttrObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: [
+          'class',
+          'dark',
+          'data-theme',
+          'data-color-mode',
+          'data-bs-theme',
+          'data-mode',
+          'data-color-scheme',
+          'theme'
+        ]
       });
     }
 

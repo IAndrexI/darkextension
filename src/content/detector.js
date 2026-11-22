@@ -5,7 +5,7 @@
 
   const DARK_LUMINANCE_THRESHOLD = 0.22;
 
-  const DARK_CLASS_RE = /^(dark|dark-mode|dark-theme|theme-dark|night|night-mode|is-dark|color-scheme-dark|theme--dark|sl-theme-dark)$/i;
+  const DARK_CLASS_RE = /^(dark|dark-mode|dark-theme|theme-dark|night|night-mode|is-dark|color-scheme-dark|theme--dark|sl-theme-dark|skin-theme-clientpref-night|tw-theme--dark|theme-night|darkMode|v-theme--dark|bp4-dark|bp5-dark|pf-v5-theme-dark)$/i;
   const DARK_ATTR_NAMES = [
     'data-theme',
     'data-color-mode',
@@ -13,9 +13,14 @@
     'data-mode',
     'data-color-scheme',
     'data-ui-theme',
+    'data-mantine-color-scheme',
+    'data-joy-color-scheme',
+    'data-chakra-ui-color-mode',
     'theme'
   ];
   const DARK_ATTR_VAL_RE = /^(dark|night|black|oled|midnight|dim|dark[-_].*)$/i;
+  const BRIDGE_STYLE_ID = 'darkext-native-media-bridge';
+  const activationStateMap = new WeakMap();
   const PRIMARY_CONTAINER_SELECTOR = 'main, [role="main"], #main, #content, #app, #root, #__next, .app, .main-content';
   const MAX_CANDIDATE_CHECKS = 15;
   const EARLY_EXIT_COVERAGE = 0.55;
@@ -101,6 +106,12 @@
         if (!cls.startsWith('darkext') && DARK_CLASS_RE.test(cls)) {
           return true;
         }
+      }
+    }
+    if (typeof el.hasAttribute === 'function' && el.hasAttribute('dark')) {
+      const darkVal = (el.getAttribute('dark') || '').trim().toLowerCase();
+      if (darkVal === '' || darkVal === 'true' || darkVal === 'dark') {
+        return true;
       }
     }
     if (typeof el.getAttribute === 'function') {
@@ -266,7 +277,11 @@
     const opaqueFound = Boolean(effectiveSample);
     const bgLuminance = opaqueFound ? effectiveSample.lum : 1;
     const hasDarkAttr = hasDarkHintsOnElement(root) || hasDarkHintsOnElement(body);
-    const metaDarkEffective = metaInfo.isDarkOnly || (metaInfo.isAdaptive && systemDark) || computedDarkColorScheme;
+    const activatedMeta = activationStateMap.has(targetDoc);
+    const metaDarkEffective =
+      metaInfo.isDarkOnly ||
+      (metaInfo.isAdaptive && (systemDark || activatedMeta)) ||
+      computedDarkColorScheme;
 
     if (hasDarkAttr) {
       if (opaqueFound && bgLuminance < DARK_LUMINANCE_THRESHOLD) {
@@ -344,8 +359,192 @@
     };
   }
 
+  function collectDarkMediaCssRules(ruleList, out) {
+    if (!ruleList) return;
+    for (let i = 0; i < ruleList.length; i += 1) {
+      const rule = ruleList[i];
+      if (!rule) continue;
+      if (rule.type === 4 || (rule.media && typeof rule.conditionText === 'string')) {
+        const cond = String(rule.conditionText || (rule.media && rule.media.mediaText) || '').toLowerCase();
+        if (cond.includes('prefers-color-scheme') && cond.includes('dark') && !cond.includes('light')) {
+          const inner = rule.cssRules;
+          if (inner) {
+            for (let j = 0; j < inner.length; j += 1) {
+              if (inner[j] && inner[j].cssText) {
+                out.push(inner[j].cssText);
+              }
+            }
+          }
+        } else if (rule.cssRules) {
+          collectDarkMediaCssRules(rule.cssRules, out);
+        }
+      } else if (rule.cssRules) {
+        collectDarkMediaCssRules(rule.cssRules, out);
+      }
+    }
+  }
+
+  function activateNativeDarkIfAvailable(doc) {
+    const targetDoc = doc || (typeof document !== 'undefined' ? document : null);
+    if (!targetDoc || !targetDoc.documentElement) {
+      return { activated: false, methods: [] };
+    }
+
+    const root = targetDoc.documentElement;
+    const win = targetDoc.defaultView || (typeof window !== 'undefined' ? window : global);
+    let state = activationStateMap.get(targetDoc);
+    if (!state) {
+      state = { methods: [] };
+    }
+
+    let didActivate = false;
+
+    // 1. Wikipedia / Wikimedia Vector 2022
+    if (root.classList && typeof root.classList.contains === 'function') {
+      if (root.classList.contains('skin-theme-clientpref-day') || root.classList.contains('skin-theme-clientpref-os')) {
+        if (!state.wikiOrigClass) {
+          state.wikiOrigClass = root.classList.contains('skin-theme-clientpref-day')
+            ? 'skin-theme-clientpref-day'
+            : 'skin-theme-clientpref-os';
+        }
+        root.classList.remove('skin-theme-clientpref-day', 'skin-theme-clientpref-os');
+        root.classList.add('skin-theme-clientpref-night');
+        if (!state.methods.includes('wikipedia-vector')) state.methods.push('wikipedia-vector');
+        didActivate = true;
+      }
+    }
+
+    // 2. GitHub / Primer data-color-mode
+    if (typeof root.getAttribute === 'function' && typeof root.hasAttribute === 'function') {
+      const colorMode = root.getAttribute('data-color-mode');
+      if ((colorMode === 'light' || colorMode === 'auto') && root.hasAttribute('data-dark-theme')) {
+        if (state.origColorMode === undefined) {
+          state.origColorMode = colorMode;
+        }
+        root.setAttribute('data-color-mode', 'dark');
+        if (!state.methods.includes('github-color-mode')) state.methods.push('github-color-mode');
+        didActivate = true;
+      }
+    }
+
+    let systemDark = false;
+    try {
+      systemDark = Boolean(
+        win &&
+        typeof win.matchMedia === 'function' &&
+        win.matchMedia('(prefers-color-scheme: dark)').matches
+      );
+    } catch (_) {
+      systemDark = false;
+    }
+
+    // 3. Adaptive <meta name="color-scheme" content="light dark">
+    const metaInfo = inspectMetaColorScheme(targetDoc);
+    if (metaInfo.isAdaptive && !systemDark && root.style && typeof root.style.setProperty === 'function') {
+      if (state.origColorScheme === undefined) {
+        state.origColorScheme = {
+          value: root.style.getPropertyValue('color-scheme'),
+          priority: root.style.getPropertyPriority('color-scheme')
+        };
+      }
+      root.style.setProperty('color-scheme', 'dark', 'important');
+      if (!state.methods.includes('meta-color-scheme')) state.methods.push('meta-color-scheme');
+      didActivate = true;
+    }
+
+    // 4. Accessible CSS @media (prefers-color-scheme: dark) rules when OS is light
+    if (!systemDark && targetDoc.styleSheets && typeof targetDoc.createElement === 'function') {
+      const collected = [];
+      for (let i = 0; i < targetDoc.styleSheets.length; i += 1) {
+        const sheet = targetDoc.styleSheets[i];
+        if (!sheet) continue;
+        const owner = sheet.ownerNode;
+        if (
+          owner &&
+          (owner.id === BRIDGE_STYLE_ID ||
+            (typeof owner.id === 'string' && owner.id.startsWith('darkext-')) ||
+            (typeof owner.hasAttribute === 'function' && owner.hasAttribute('data-darkext-fallback')))
+        ) {
+          continue;
+        }
+        try {
+          if (sheet.cssRules) {
+            collectDarkMediaCssRules(sheet.cssRules, collected);
+          }
+        } catch (_) {
+          // Cross-origin stylesheet; ignore SecurityError
+        }
+      }
+      if (collected.length > 0) {
+        let bridgeEl = typeof targetDoc.getElementById === 'function'
+          ? targetDoc.getElementById(BRIDGE_STYLE_ID)
+          : null;
+        if (!bridgeEl) {
+          bridgeEl = targetDoc.createElement('style');
+          bridgeEl.id = BRIDGE_STYLE_ID;
+          const parent = targetDoc.head || root;
+          if (parent && typeof parent.appendChild === 'function') {
+            parent.appendChild(bridgeEl);
+          }
+        }
+        const cssText = collected.join('\n');
+        if (bridgeEl.textContent !== cssText) {
+          bridgeEl.textContent = cssText;
+        }
+        if (!state.methods.includes('media-bridge')) state.methods.push('media-bridge');
+        didActivate = true;
+      }
+    }
+
+    if (didActivate || state.methods.length > 0) {
+      activationStateMap.set(targetDoc, state);
+      return { activated: true, methods: state.methods.slice() };
+    }
+    return { activated: false, methods: [] };
+  }
+
+  function restoreNativeDarkActivation(doc) {
+    const targetDoc = doc || (typeof document !== 'undefined' ? document : null);
+    if (!targetDoc || !targetDoc.documentElement) {
+      return;
+    }
+    const root = targetDoc.documentElement;
+    const bridgeEl = typeof targetDoc.getElementById === 'function'
+      ? targetDoc.getElementById(BRIDGE_STYLE_ID)
+      : null;
+    if (bridgeEl && bridgeEl.parentNode) {
+      bridgeEl.parentNode.removeChild(bridgeEl);
+    }
+
+    const state = activationStateMap.get(targetDoc);
+    if (!state) {
+      return;
+    }
+
+    if (state.wikiOrigClass && root.classList) {
+      root.classList.remove('skin-theme-clientpref-night');
+      root.classList.add(state.wikiOrigClass);
+    }
+
+    if (state.origColorMode !== undefined && typeof root.setAttribute === 'function') {
+      root.setAttribute('data-color-mode', state.origColorMode);
+    }
+
+    if (state.origColorScheme !== undefined && root.style) {
+      if (state.origColorScheme.value) {
+        root.style.setProperty('color-scheme', state.origColorScheme.value, state.origColorScheme.priority || '');
+      } else {
+        root.style.removeProperty('color-scheme');
+      }
+    }
+
+    activationStateMap.delete(targetDoc);
+  }
+
   DarkExt.Detector = {
-    detectNativeDarkMode
+    detectNativeDarkMode,
+    activateNativeDarkIfAvailable,
+    restoreNativeDarkActivation
   };
 
   if (typeof module !== 'undefined' && module.exports) {

@@ -85,6 +85,17 @@
         "src/content/dynamic-engine.js",
         "src/content/content.js"
       ]
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "js": [
+        "src/content/native-dark-enforcer.js"
+      ]
     }
   ]
 }
